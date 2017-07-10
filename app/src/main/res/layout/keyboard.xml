@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_1"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_2"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_3"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_weight="1">
+
+            <include
+                android:id="@+id/layout_keyboard_key_4"
+                layout="@layout/keyboard_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_weight="1">
+
+            <include
+                android:id="@+id/layout_keyboard_key_5"
+                layout="@layout/keyboard_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_weight="1">
+
+            <include
+                android:id="@+id/layout_keyboard_key_6"
+                layout="@layout/keyboard_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_7"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_8"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_9"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_margin="2dp"
+            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <include layout="@layout/keyboard_key"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/layout_keyboard_key_0"/>
+        </LinearLayout>
+        <View
+            android:layout_margin="2dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</LinearLayout>

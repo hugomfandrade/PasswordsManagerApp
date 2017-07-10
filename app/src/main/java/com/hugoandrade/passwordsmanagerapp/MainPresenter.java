@@ -34,7 +34,7 @@ public class MainPresenter
     }
 
     private void getAllPasswordEntries() {
-        getModel().getAllPasswordEntries(GlobalData.account.id);
+        getModel().getAllPasswordEntries();
     }
 
     @Override

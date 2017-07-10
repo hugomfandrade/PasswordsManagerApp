@@ -1,5 +1,7 @@
 package com.hugoandrade.passwordsmanagerapp;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,34 +13,57 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginActivity extends AppCompatActivity {
-
-    @SuppressWarnings("unused") private final static String TAG = LoginActivity.class.getSimpleName();
-
-    private static final int REQUEST_CODE = 1;
+public class ReconfigureActivity extends AppCompatActivity {
 
     private EditText etCode;
+    private TextView tvInstructions;
     private List<TextView> tvKeyboardKeyList = new ArrayList<>();
+
+    private int configurationStep = 0;
+    private String newPIN = "";
+
+    public static Intent makeIntent(Context context) {
+        return new Intent(context, ReconfigureActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_reconfigure);
+
+        setResult(Activity.RESULT_CANCELED);
 
         initializeViews();
 
-        if (SharedPreferencesUtils.getCode(this) == null)
-            startActivityForResult(
-                    ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
+        setUpInitialActivityStep();
+        setUpActivityFlow();
     }
 
-    @SuppressWarnings("ConstantConditions")
+    private void setUpInitialActivityStep() {
+        configurationStep = 0;
+        if (SharedPreferencesUtils.getCode(this) == null)
+            configurationStep = 1;
+    }
+
+    private void setUpActivityFlow() {
+        if (configurationStep == 0) {
+            tvInstructions.setText("Type current PIN");
+        }
+        else if (configurationStep == 1) {
+            tvInstructions.setText("Type new PIN");
+        }
+        else if (configurationStep == 2) {
+            tvInstructions.setText("Confirm new PIN");
+        }
+        etCode.setText("");
+    }
+
     private void initializeViews() {
         etCode = (EditText) findViewById(R.id.et_code);
         etCode.setText("");
-        TextView tvReset = (TextView) findViewById(R.id.tv_reset);
-        TextView tvReconfigure = (TextView) findViewById(R.id.tv_reconfigure);
+        tvInstructions = (TextView) findViewById(R.id.tv_instructions);
+        tvInstructions.setText("");
 
         tvKeyboardKeyList.clear();
         tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_0).findViewById(R.id.tv_keyboard));
@@ -57,22 +82,6 @@ public class LoginActivity extends AppCompatActivity {
 
         for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
             tvKeyboardKeyList.get(i).setOnClickListener(mOnKeyboardKeyClicked);
-
-        assert tvReconfigure != null;
-        tvReconfigure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(
-                        ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
-            }
-        });
-        assert tvReset != null;
-        tvReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                etCode.setText("");
-            }
-        });
     }
 
     private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
@@ -83,31 +92,45 @@ public class LoginActivity extends AppCompatActivity {
                     etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));
 
             if (etCode.getText().toString().trim().length() == 4) {
-                String code = SharedPreferencesUtils.getCode(LoginActivity.this);
-                if (code == null || !code.equals(etCode.getText().toString().trim())) {
-                    reportMessage("Wrong PIN");
-                    etCode.setText("");
-                }
-                else {
-                    successfulLogin();
-                }
+                checkTypedPIN();
+
             }
         }
     };
 
-    public void successfulLogin() {
-        startActivity(MainActivity.makeIntent(this));
-        finish();
-
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            etCode.setText("");
+    private void checkTypedPIN() {
+        if (configurationStep == 0) {
+            String code = SharedPreferencesUtils.getCode(ReconfigureActivity.this);
+            if (code == null || !code.equals(etCode.getText().toString().trim())) {
+                reportMessage("Wrong PIN.");
+                etCode.setText("");
+            }
+            else {
+                configurationStep++;
+                setUpActivityFlow();
+            }
+        }
+        else if (configurationStep == 1) {
+            newPIN = etCode.getText().toString().trim();
+            configurationStep++;
+            setUpActivityFlow();
+        }
+        else if (configurationStep == 2) {
+            if (!newPIN.equals(etCode.getText().toString().trim())) {
+                reportMessage("Wrong PIN. Type New PIN again");
+                newPIN = "";
+                configurationStep = 1;
+                setUpActivityFlow();
+            }
+            else {
+                SharedPreferencesUtils.putCode(ReconfigureActivity.this, newPIN);
+                setResult(RESULT_OK);
+                finish();
+            }
         }
     }
 
     public void reportMessage(String message) {
-        Options.showSnackBar(findViewById(R.id.layout_activity_login), message);
+        Options.showSnackBar(findViewById(R.id.layout_activity_reconfigurate), message);
     }
 }

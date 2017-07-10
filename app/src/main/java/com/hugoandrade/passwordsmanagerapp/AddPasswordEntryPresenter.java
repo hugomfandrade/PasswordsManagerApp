@@ -34,7 +34,7 @@ public class AddPasswordEntryPresenter
     @Override
     public void addPasswordEntry(String accountName, String password) {
         getView().enableInputFields(false);
-        getModel().addPasswordEntry(GlobalData.account.id, accountName, password);
+        getModel().addPasswordEntry(accountName, password);
     }
 
     @Override

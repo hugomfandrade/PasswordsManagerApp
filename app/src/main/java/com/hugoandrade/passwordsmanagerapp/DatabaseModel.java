@@ -6,15 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DatabaseModel {
 
-    private final static String TAG = DatabaseModel.class.getSimpleName();
+    @SuppressWarnings("unused") private final static String TAG = DatabaseModel.class.getSimpleName();
 
     // Database fields
     private SQLiteDatabase database;
@@ -32,7 +30,7 @@ public abstract class DatabaseModel {
         dbHelper.close();
     }
 
-    protected void retrieveAllPasswordEntries(final String userID) {
+    protected void retrieveAllPasswordEntries() {
         AsyncTask<Void, Void, List<PasswordEntry>> task = new AsyncTask<Void, Void, List<PasswordEntry>>() {
 
             @Override
@@ -40,8 +38,7 @@ public abstract class DatabaseModel {
                 List<PasswordEntry> passwordEntryList = new ArrayList<>();
 
                 Cursor cursor = database.query(PasswordEntry.Entry.TABLE_NAME, null,
-                        PasswordEntry.Entry.COL_USER_ID + " = ?" , new String[] {userID},
-                        null, null, null);
+                        null, null, null, null, null);
 
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
@@ -63,38 +60,7 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    protected void retrieveAccount(final String username, final String password) {
-        AsyncTask<Void, Void, Account> task = new AsyncTask<Void, Void, Account>() {
-
-            @Override
-            protected Account doInBackground(Void... params) {
-                Cursor cursor = database.query(Account.Entry.TABLE_NAME, null,
-                        Account.Entry.COL_USERNAME + " = ?"  + " AND " + Account.Entry.COL_PASSWORD + " = ?",
-                        new String[] {username, password},
-                        null, null, null);
-
-                cursor.moveToFirst();
-                while (!cursor.isAfterLast()) {
-                    Account account = Account.parseFromCursor(cursor);
-                    cursor.close();
-                    return account;
-                }
-                // make sure to close the cursor
-
-                cursor.close();
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Account account) {
-                super.onPostExecute(account);
-                onGetAccount(account);
-            }
-        };
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    protected void insertPasswordEntry(final String userID, final String accountName, final String password) {
+    protected void insertPasswordEntry(final String accountName, final String password) {
         AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
 
             @Override
@@ -102,7 +68,6 @@ public abstract class DatabaseModel {
 
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
-                values.put(PasswordEntry.Entry.COL_USER_ID, userID);
                 values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, accountName);
                 values.put(PasswordEntry.Entry.COL_PASSWORD, password);
 
@@ -134,55 +99,7 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    protected void insertAccount(final String username, final String password) {
-        AsyncTask<Void, Void, Account> task = new AsyncTask<Void, Void, Account>() {
-
-            @Override
-            protected Account doInBackground(Void... params) {
-
-                // Create a new map of values, where column names are the keys
-                ContentValues values = new ContentValues();
-                values.put(Account.Entry.COL_USERNAME, username);
-                values.put(Account.Entry.COL_PASSWORD, password);
-
-                // Insert the new row, returning the primary key value of the new row
-                long newRowId = database.insert(Account.Entry.TABLE_NAME, null, values);
-
-                Log.e(TAG, "--> " + String.valueOf(newRowId));
-                Cursor cursor = database.query(Account.Entry.TABLE_NAME, null,
-                        Account.Entry.COL__ID + " = ?", new String[] {String.valueOf(newRowId)},
-                        null, null, null);
-
-                cursor.moveToFirst();
-                while (!cursor.isAfterLast()) {
-                    Account account = Account.parseFromCursor(cursor);
-                    cursor.close();
-                    return account;
-                }
-                // make sure to close the cursor
-
-                cursor.close();
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Account account) {
-                super.onPostExecute(account);
-                onInsertAccount(account);
-            }
-        };
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     protected void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList){
-        //No-op
-    }
-
-    protected void onInsertAccount(Account account){
-        //No-op
-    }
-
-    protected void onGetAccount(Account account){
         //No-op
     }
 
@@ -200,17 +117,9 @@ public abstract class DatabaseModel {
         private static final String DATABASE_NAME = "PasswordManagerApp";
         private static final int DATABASE_VERSION = 1;
 
-        private static final String CREATE_DB_TABLE_ACCOUNT =
-                " CREATE TABLE " + Account.Entry.TABLE_NAME + " (" +
-                        " " + Account.Entry.COL__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        " " + Account.Entry.COL_USERNAME + " TEXT UNIQUE NOT NULL, " +
-                        " " + Account.Entry.COL_PASSWORD + " TEXT NOT NULL " +
-                        " );";
-
         private static final String CREATE_DB_TABLE_PASSWORD_ENTRY =
                 " CREATE TABLE " + PasswordEntry.Entry.TABLE_NAME + " (" +
                         " " + PasswordEntry.Entry.COL__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        " " + PasswordEntry.Entry.COL_USER_ID + " TEXT NOT NULL, " +
                         " " + PasswordEntry.Entry.COL_ACCOUNT_NAME + " TEXT UNIQUE NOT NULL, " +
                         " " + PasswordEntry.Entry.COL_PASSWORD + " TEXT NOT NULL " +
                         " );";
@@ -224,13 +133,11 @@ public abstract class DatabaseModel {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL(CREATE_DB_TABLE_ACCOUNT);
             db.execSQL(CREATE_DB_TABLE_PASSWORD_ENTRY);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " +  Account.Entry.TABLE_NAME);
             db.execSQL("DROP TABLE IF EXISTS " +  PasswordEntry.Entry.TABLE_NAME);
             onCreate(db);
         }

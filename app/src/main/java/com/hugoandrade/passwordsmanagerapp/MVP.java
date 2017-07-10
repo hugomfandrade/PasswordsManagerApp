@@ -15,7 +15,7 @@ public interface MVP {
         void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList);
     }
     interface ProvidedMainModelOps extends ModelOps<MVP.RequiredMainPresenterOps> {
-        void getAllPasswordEntries(String userID);
+        void getAllPasswordEntries();
     }
 
     /* ****************************************************************************************** */
@@ -33,43 +33,6 @@ public interface MVP {
         void onInsertPasswordEntry(PasswordEntry passwordEntry);
     }
     interface ProvidedAddPasswordEntryModelOps extends ModelOps<MVP.RequiredAddPasswordEntryPresenterOps> {
-        void addPasswordEntry(String userID, String accountName, String password);
+        void addPasswordEntry(String accountName, String password);
     }
-
-    /* ****************************************************************************************** */
-    /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
-    /* ****************************************************************************************** */
-    interface RequiredLoginViewOps extends ContextView {
-        void enableInputFields(boolean areEnabled);
-        void successfulLogin();
-        void reportMessage(String message);
-    }
-    interface ProvidedLoginPresenterOps extends PresenterOps<RequiredLoginViewOps> {
-        void login(String username, String password);
-    }
-    interface RequiredLoginPresenterOps extends ContextView {
-        void onGetAccount(Account account);
-    }
-    interface ProvidedLoginModelOps extends ModelOps<MVP.RequiredLoginPresenterOps> {
-        void login(String username, String password);
-    }
-
-    /* ****************************************************************************************** */
-    /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
-    /* ****************************************************************************************** */
-    interface RequiredSignUpViewOps extends ContextView {
-        void enableInputFields(boolean areEnabled);
-        void successfulSignUp(Account account);
-        void reportMessage(String message);
-    }
-    interface ProvidedSignUpPresenterOps extends PresenterOps<RequiredSignUpViewOps> {
-        void signUp(String username, String password);
-    }
-    interface RequiredSignUpPresenterOps extends ContextView {
-        void onInsertAccount(Account account);
-    }
-    interface ProvidedSignUpModelOps extends ModelOps<MVP.RequiredSignUpPresenterOps> {
-        void signUp(String username, String password);
-    }
-
 }

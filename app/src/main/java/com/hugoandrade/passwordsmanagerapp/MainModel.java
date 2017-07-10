@@ -33,8 +33,8 @@ public class MainModel extends DatabaseModel implements MVP.ProvidedMainModelOps
     }
 
     @Override
-    public void getAllPasswordEntries(final String userID) {
-        super.retrieveAllPasswordEntries(userID);
+    public void getAllPasswordEntries() {
+        super.retrieveAllPasswordEntries();
     }
 
     @Override

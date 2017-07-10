@@ -10,19 +10,16 @@ public class PasswordEntry implements Parcelable {
         public static final String TABLE_NAME = "PasswordEntry";
 
         public final static String COL__ID = "_id";
-        public final static String COL_USER_ID = "UserID";
         public final static String COL_ACCOUNT_NAME = "AccountName";
         public final static String COL_PASSWORD = "Password";
     }
 
     public String id;
-    public String userID;
     public String accountName;
     public String password;
 
-    public PasswordEntry(String id, String userID, String accountName, String password) {
+    public PasswordEntry(String id, String accountName, String password) {
         this.id = id;
-        this.userID = userID;
         this.accountName = accountName;
         this.password = password;
     }
@@ -33,7 +30,6 @@ public class PasswordEntry implements Parcelable {
 
     public void readFromParcel(Parcel in) {
         id = in.readString();
-        userID = in.readString();
         accountName = in.readString();
         password = in.readString();
     }
@@ -59,7 +55,6 @@ public class PasswordEntry implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(userID);
         dest.writeString(accountName);
         dest.writeString(password);
     }
@@ -67,7 +62,6 @@ public class PasswordEntry implements Parcelable {
     public static PasswordEntry parseFromCursor(Cursor cursor) {
         return new PasswordEntry(
                 cursor.getString(cursor.getColumnIndex(Entry.COL__ID)),
-                cursor.getString(cursor.getColumnIndex(Entry.COL_USER_ID)),
                 cursor.getString(cursor.getColumnIndex(Entry.COL_ACCOUNT_NAME)),
                 cursor.getString(cursor.getColumnIndex(Entry.COL_PASSWORD)));
     }

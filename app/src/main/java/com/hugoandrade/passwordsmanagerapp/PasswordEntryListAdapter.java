@@ -76,7 +76,7 @@ public class PasswordEntryListAdapter extends RecyclerView.Adapter<PasswordEntry
 
         public boolean isVisible;
         public MPasswordEntry(PasswordEntry passwordEntry, boolean isVisible) {
-            super(passwordEntry.id, passwordEntry.userID, passwordEntry.accountName, passwordEntry.password);
+            super(passwordEntry.id, passwordEntry.accountName, passwordEntry.password);
             this.isVisible = isVisible;
         }
     }
