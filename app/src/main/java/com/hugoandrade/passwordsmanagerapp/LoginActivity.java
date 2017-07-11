@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText etCode;
     private List<TextView> tvKeyboardKeyList = new ArrayList<>();
+    private ImageView ivKeyboardBackspace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     private void initializeViews() {
         etCode = (EditText) findViewById(R.id.et_code);
         etCode.setText("");
-        TextView tvReset = (TextView) findViewById(R.id.tv_reset);
         TextView tvReconfigure = (TextView) findViewById(R.id.tv_reconfigure);
 
         tvKeyboardKeyList.clear();
@@ -51,12 +52,15 @@ public class LoginActivity extends AppCompatActivity {
         tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_7).findViewById(R.id.tv_keyboard));
         tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_8).findViewById(R.id.tv_keyboard));
         tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_9).findViewById(R.id.tv_keyboard));
+        ivKeyboardBackspace = (ImageView) findViewById(R.id.iv_keyboard_backspace);
 
         for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
             tvKeyboardKeyList.get(i).setText(String.valueOf(i));
 
         for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
             tvKeyboardKeyList.get(i).setOnClickListener(mOnKeyboardKeyClicked);
+
+        ivKeyboardBackspace.setOnClickListener(mOnKeyboardKeyClicked);
 
         assert tvReconfigure != null;
         tvReconfigure.setOnClickListener(new View.OnClickListener() {
@@ -66,18 +70,14 @@ public class LoginActivity extends AppCompatActivity {
                         ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
             }
         });
-        assert tvReset != null;
-        tvReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                etCode.setText("");
-            }
-        });
     }
 
     private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (v == ivKeyboardBackspace && etCode.getText().length() > 0)
+                etCode.setText(TextUtils.substring(etCode.getText(), 0, etCode.getText().length() - 1));
+
             for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
                 if (v == tvKeyboardKeyList.get(i))
                     etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));

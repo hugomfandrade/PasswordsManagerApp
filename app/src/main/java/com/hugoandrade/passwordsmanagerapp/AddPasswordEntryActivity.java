@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -56,6 +58,16 @@ public class AddPasswordEntryActivity
     private void initializeViews() {
         etAccountName = (EditText) findViewById(R.id.et_account_name);
         etPassword   = (EditText) findViewById(R.id.et_password);
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    tvAddPasswordEntry.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
         tvAddPasswordEntry = (TextView) findViewById(R.id.tv_add_password_entry);
 
         etAccountName.addTextChangedListener(mTextWatcher);

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class ReconfigureActivity extends AppCompatActivity {
     private EditText etCode;
     private TextView tvInstructions;
     private List<TextView> tvKeyboardKeyList = new ArrayList<>();
+    private ImageView ivKeyboardBackspace;
 
     private int configurationStep = 0;
     private String newPIN = "";
@@ -40,6 +42,36 @@ public class ReconfigureActivity extends AppCompatActivity {
         setUpActivityFlow();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    private void initializeViews() {
+        etCode = (EditText) findViewById(R.id.et_code);
+        etCode.setText("");
+        tvInstructions = (TextView) findViewById(R.id.tv_instructions);
+        tvInstructions.setText("");
+
+        tvKeyboardKeyList.clear();
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_0).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_1).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_2).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_3).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_4).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_5).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_6).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_7).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_8).findViewById(R.id.tv_keyboard));
+        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_9).findViewById(R.id.tv_keyboard));
+        ivKeyboardBackspace = (ImageView) findViewById(R.id.iv_keyboard_backspace);
+
+
+        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
+            tvKeyboardKeyList.get(i).setText(String.valueOf(i));
+
+        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
+            tvKeyboardKeyList.get(i).setOnClickListener(mOnKeyboardKeyClicked);
+
+        ivKeyboardBackspace.setOnClickListener(mOnKeyboardKeyClicked);
+    }
+
     private void setUpInitialActivityStep() {
         configurationStep = 0;
         if (SharedPreferencesUtils.getCode(this) == null)
@@ -58,45 +90,6 @@ public class ReconfigureActivity extends AppCompatActivity {
         }
         etCode.setText("");
     }
-
-    private void initializeViews() {
-        etCode = (EditText) findViewById(R.id.et_code);
-        etCode.setText("");
-        tvInstructions = (TextView) findViewById(R.id.tv_instructions);
-        tvInstructions.setText("");
-
-        tvKeyboardKeyList.clear();
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_0).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_1).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_2).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_3).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_4).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_5).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_6).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_7).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_8).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_9).findViewById(R.id.tv_keyboard));
-
-        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-            tvKeyboardKeyList.get(i).setText(String.valueOf(i));
-
-        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-            tvKeyboardKeyList.get(i).setOnClickListener(mOnKeyboardKeyClicked);
-    }
-
-    private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-                if (v == tvKeyboardKeyList.get(i))
-                    etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));
-
-            if (etCode.getText().toString().trim().length() == 4) {
-                checkTypedPIN();
-
-            }
-        }
-    };
 
     private void checkTypedPIN() {
         if (configurationStep == 0) {
@@ -129,6 +122,23 @@ public class ReconfigureActivity extends AppCompatActivity {
             }
         }
     }
+
+    private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v == ivKeyboardBackspace && etCode.getText().length() > 0)
+                etCode.setText(TextUtils.substring(etCode.getText(), 0, etCode.getText().length() - 1));
+
+            for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
+                if (v == tvKeyboardKeyList.get(i))
+                    etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));
+
+            if (etCode.getText().toString().trim().length() == 4) {
+                checkTypedPIN();
+
+            }
+        }
+    };
 
     public void reportMessage(String message) {
         Options.showSnackBar(findViewById(R.id.layout_activity_reconfigurate), message);

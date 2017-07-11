@@ -8,14 +8,20 @@ public interface MVP {
     /* ****************************************************************************************** */
     interface RequiredMainViewOps extends ContextView {
         void populatePasswordEntries(List<PasswordEntry> passwordEntryList);
+        void removePasswordEntryListFromListAdapter(List<PasswordEntry> passwordEntryList);
+        void removePasswordEntryFromListAdapter(PasswordEntry passwordEntry);
     }
     interface ProvidedMainPresenterOps extends PresenterOps<RequiredMainViewOps> {
+        void deletePasswordEntryList(List<PasswordEntry> passwordEntryList);
     }
     interface RequiredMainPresenterOps extends ContextView {
         void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList);
+        void onDeleteAllPasswordEntries(List<PasswordEntry> passwordEntryList);
+        void onDeletePasswordEntry(PasswordEntry passwordEntry);
     }
     interface ProvidedMainModelOps extends ModelOps<MVP.RequiredMainPresenterOps> {
         void getAllPasswordEntries();
+        void deletePasswordEntryList(List<PasswordEntry> passwordEntryList);
     }
 
     /* ****************************************************************************************** */

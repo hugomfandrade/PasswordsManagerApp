@@ -33,6 +33,11 @@ public class MainPresenter
         getModel().onDestroy(isChangingConfiguration);
     }
 
+    @Override
+    public void deletePasswordEntryList(List<PasswordEntry> passwordEntryList) {
+        getModel().deletePasswordEntryList(passwordEntryList);
+    }
+
     private void getAllPasswordEntries() {
         getModel().getAllPasswordEntries();
     }
@@ -40,6 +45,16 @@ public class MainPresenter
     @Override
     public void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
         getView().populatePasswordEntries(passwordEntryList);
+    }
+
+    @Override
+    public void onDeleteAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
+        getView().removePasswordEntryListFromListAdapter(passwordEntryList);
+    }
+
+    @Override
+    public void onDeletePasswordEntry(PasswordEntry passwordEntry) {
+        getView().removePasswordEntryFromListAdapter(passwordEntry);
     }
 
     @Override

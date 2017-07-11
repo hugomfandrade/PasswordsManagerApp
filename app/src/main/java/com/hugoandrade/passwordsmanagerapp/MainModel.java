@@ -38,8 +38,29 @@ public class MainModel extends DatabaseModel implements MVP.ProvidedMainModelOps
     }
 
     @Override
+    public void deletePasswordEntryList(List<PasswordEntry> passwordEntryList) {
+        super.deleteAllPasswordEntries(passwordEntryList);
+
+        //OU
+        //for (PasswordEntry e : passwordEntryList)
+        //    super.deletePasswordEntry(e);
+    }
+
+    @Override
     protected void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
         if (mPresenter != null && mPresenter.get() != null)
             mPresenter.get().onGetAllPasswordEntries(passwordEntryList);
+    }
+
+    @Override
+    protected void onDeleteAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
+        if (mPresenter != null && mPresenter.get() != null)
+            mPresenter.get().onDeleteAllPasswordEntries(passwordEntryList);
+    }
+
+    @Override
+    protected void onDeletePasswordEntry(PasswordEntry passwordEntry) {
+        if (mPresenter != null && mPresenter.get() != null)
+            mPresenter.get().onDeletePasswordEntry(passwordEntry);
     }
 }

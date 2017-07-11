@@ -99,6 +99,60 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    protected void deleteAllPasswordEntries(final List<PasswordEntry> passwordEntryList) {
+        AsyncTask<Void, Void, List<PasswordEntry>> task = new AsyncTask<Void, Void, List<PasswordEntry>>() {
+
+            @Override
+            protected List<PasswordEntry> doInBackground(Void... params) {
+                List<PasswordEntry> deletePasswordEntryList = new ArrayList<>();
+
+                for (PasswordEntry passwordEntry : passwordEntryList) {
+                    int nRowsAffected = database.delete(
+                            PasswordEntry.Entry.TABLE_NAME,
+                            PasswordEntry.Entry.COL__ID + " = ?",
+                            new String[]{String.valueOf(passwordEntry.id)});
+
+                    if (nRowsAffected != 0)
+                        deletePasswordEntryList.add(passwordEntry);
+                }
+
+                return deletePasswordEntryList;
+            }
+
+            @Override
+            protected void onPostExecute(List<PasswordEntry> passwordEntryList) {
+                super.onPostExecute(passwordEntryList);
+                onDeleteAllPasswordEntries(passwordEntryList);
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    protected void deletePasswordEntry(final PasswordEntry passwordEntry) {
+        AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
+
+            @Override
+            protected PasswordEntry doInBackground(Void... params) {
+                int nRowsAffected = database.delete(
+                        PasswordEntry.Entry.TABLE_NAME,
+                        PasswordEntry.Entry.COL__ID + " = ?",
+                        new String[]{String.valueOf(passwordEntry.id)});
+
+                if (nRowsAffected == 0)
+                    return null;
+                else
+                    return passwordEntry;
+            }
+
+            @Override
+            protected void onPostExecute(PasswordEntry passwordEntry) {
+                super.onPostExecute(passwordEntry);
+                onDeletePasswordEntry(passwordEntry);
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     protected void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList){
         //No-op
     }
@@ -107,6 +161,13 @@ public abstract class DatabaseModel {
         //No-op
     }
 
+    protected void onDeleteAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
+        //No-op
+    }
+
+    protected void onDeletePasswordEntry(PasswordEntry passwordEntry) {
+        //No-op
+    }
 
     /**
      * Helper class that actually creates and manages

@@ -65,6 +65,18 @@ public abstract class GenericActivity<RequiredViewOps,
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPresenterInstance.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPresenterInstance.onPause();
+    }
+
     /**
      * Return the initialized ProvidedPresenterOps instance for use by
      * application logic in the View layer.
