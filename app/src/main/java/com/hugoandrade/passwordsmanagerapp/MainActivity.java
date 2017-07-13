@@ -9,9 +9,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity
@@ -20,10 +23,11 @@ public class MainActivity
 
     private static final int REQUEST_CODE = 1;
 
-    public static final int MODE_MAIN = 1;
+    public static final int MODE_DEFAULT = 1;
     public static final int MODE_DELETE_EDIT = 2;
+    public static final int MODE_REORDER = 3;
 
-    private int viewMode;
+    private int viewMode = 0;
 
     private RecyclerView rvPasswordEntry;
     private PasswordEntryListAdapter adapterPasswordEntryList;
@@ -40,7 +44,7 @@ public class MainActivity
 
         initializeViews();
 
-        viewMode = MODE_MAIN;
+        enableDefaultMode();
 
         super.onCreate(MainPresenter.class, this);
     }
@@ -54,7 +58,8 @@ public class MainActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         switch (viewMode) {
-            case MODE_MAIN:
+            case MODE_DEFAULT:
+            case MODE_REORDER:
                 getMenuInflater().inflate(R.menu.menu_main, menu);
                 Drawable drawable = menu.findItem(R.id.action_add_password).getIcon();
                 if (drawable != null) {
@@ -94,11 +99,12 @@ public class MainActivity
     }
 
     private void initializeViews() {
+        rvPasswordEntry = (RecyclerView) findViewById(R.id.rv_password_entry);
         adapterPasswordEntryList = new PasswordEntryListAdapter(viewMode);
         adapterPasswordEntryList.setOnLongClickListener(new PasswordEntryListAdapter.OnLongClickListener() {
             @Override
             public void onLongClick(PasswordEntry passwordEntry) {
-                if (viewMode == MODE_MAIN) {
+                if (viewMode == MODE_DEFAULT) {
                     enableDeleteEditMode();
                     adapterPasswordEntryList.setItemChecked(passwordEntry);
                 }
@@ -117,10 +123,28 @@ public class MainActivity
                 }
             }
         });
-        rvPasswordEntry = (RecyclerView) findViewById(R.id.rv_password_entry);
+        adapterPasswordEntryList.setOnItemMoveListener(new PasswordEntryListAdapter.OnItemMoveListener() {
+            @Override
+            public void onItemMove(List<PasswordEntry> passwordEntryAffectedList) {
+                enableReorderMode();
+                //Log.e(TAG, "------------------");for (int i = 0 ; i < adapterPasswordEntryList.getItems().size() ; i++) Log.e(TAG, adapterPasswordEntryList.getItems().get(i).accountName + ": " + Integer.toString(adapterPasswordEntryList.getItems().get(i).order));
+                for (PasswordEntry e : passwordEntryAffectedList)
+                    getPresenter().updatePasswordEntryItem(e);
+            }
+            @Override
+            public void onItemDropped() {
+                if (viewMode == MODE_REORDER) {
+                    enableDefaultMode();
+                    //for (int i = 0 ; i < adapterPasswordEntryList.getItems().size() ; i++) Log.e(TAG, adapterPasswordEntryList.getItems().get(i).accountName);
+                }
+            }
+        });
+
+        rvPasswordEntry.setHasFixedSize(true);
         rvPasswordEntry.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvPasswordEntry.setAdapter(adapterPasswordEntryList);
         rvPasswordEntry.setItemAnimator(new DefaultItemAnimator() {
+
             @Override
             public void onRemoveFinished(RecyclerView.ViewHolder item) {
                 super.onRemoveFinished(item);
@@ -129,15 +153,16 @@ public class MainActivity
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        disableDeleteEditMode();
+                        enableDefaultMode();
                     }
                 }, rvPasswordEntry.getItemAnimator().getMoveDuration());
             }
         });
+        rvPasswordEntry.getItemAnimator().setChangeDuration(0L);
     }
 
     private void enableDeleteEditMode() {
-        if (viewMode == MODE_MAIN) {
+        if (viewMode != MODE_DELETE_EDIT) {
             viewMode = MODE_DELETE_EDIT;
 
             adapterPasswordEntryList.updateViewMode(viewMode);
@@ -145,9 +170,18 @@ public class MainActivity
         }
     }
 
-    private void disableDeleteEditMode() {
-        if (viewMode == MODE_DELETE_EDIT) {
-            viewMode = MODE_MAIN;
+    private void enableDefaultMode() {
+        if (viewMode != MODE_DEFAULT) {
+            viewMode = MODE_DEFAULT;
+
+            adapterPasswordEntryList.updateViewMode(viewMode);
+            invalidateOptionsMenu();
+        }
+    }
+
+    private void enableReorderMode() {
+        if (viewMode != MODE_REORDER) {
+            viewMode = MODE_REORDER;
 
             adapterPasswordEntryList.updateViewMode(viewMode);
             invalidateOptionsMenu();
@@ -156,6 +190,12 @@ public class MainActivity
 
     @Override
     public void populatePasswordEntries(List<PasswordEntry> passwordEntryList) {
+        Collections.sort(passwordEntryList, new Comparator<PasswordEntry>() {
+            @Override
+            public int compare(PasswordEntry lhs, PasswordEntry rhs) {
+                return lhs.order - rhs.order;
+            }
+        });
         adapterPasswordEntryList.setAll(passwordEntryList);
     }
 
@@ -172,7 +212,7 @@ public class MainActivity
     @Override
     public void onBackPressed() {
         if (viewMode == MODE_DELETE_EDIT)
-            disableDeleteEditMode();
+            enableDefaultMode();
         else
             super.onBackPressed();
 

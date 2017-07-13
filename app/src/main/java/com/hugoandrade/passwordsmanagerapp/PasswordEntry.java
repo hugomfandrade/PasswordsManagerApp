@@ -12,16 +12,19 @@ public class PasswordEntry implements Parcelable {
         public final static String COL__ID = "_id";
         public final static String COL_ACCOUNT_NAME = "AccountName";
         public final static String COL_PASSWORD = "Password";
+        public final static String COL_ORDER = "OrderNumber";
     }
 
     public String id;
     public String accountName;
     public String password;
+    public int order;
 
-    public PasswordEntry(String id, String accountName, String password) {
+    public PasswordEntry(String id, String accountName, String password, int order) {
         this.id = id;
         this.accountName = accountName;
         this.password = password;
+        this.order = order;
     }
 
     protected PasswordEntry(Parcel in) {
@@ -32,6 +35,7 @@ public class PasswordEntry implements Parcelable {
         id = in.readString();
         accountName = in.readString();
         password = in.readString();
+        order = in.readInt();
     }
 
 
@@ -57,13 +61,15 @@ public class PasswordEntry implements Parcelable {
         dest.writeString(id);
         dest.writeString(accountName);
         dest.writeString(password);
+        dest.writeInt(order);
     }
 
     public static PasswordEntry parseFromCursor(Cursor cursor) {
         return new PasswordEntry(
                 cursor.getString(cursor.getColumnIndex(Entry.COL__ID)),
                 cursor.getString(cursor.getColumnIndex(Entry.COL_ACCOUNT_NAME)),
-                cursor.getString(cursor.getColumnIndex(Entry.COL_PASSWORD)));
+                cursor.getString(cursor.getColumnIndex(Entry.COL_PASSWORD)),
+                cursor.getInt(cursor.getColumnIndex(Entry.COL_ORDER)));
     }
 
 }

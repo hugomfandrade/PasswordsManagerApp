@@ -47,6 +47,11 @@ public class MainModel extends DatabaseModel implements MVP.ProvidedMainModelOps
     }
 
     @Override
+    public void updatePasswordEntryItem(PasswordEntry passwordEntry) {
+        super.updatePasswordEntryItem(passwordEntry);
+    }
+
+    @Override
     protected void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList) {
         if (mPresenter != null && mPresenter.get() != null)
             mPresenter.get().onGetAllPasswordEntries(passwordEntryList);

@@ -65,11 +65,17 @@ public abstract class DatabaseModel {
 
             @Override
             protected PasswordEntry doInBackground(Void... params) {
+                Cursor c = database.query(PasswordEntry.Entry.TABLE_NAME, null,
+                        null, null, null, null, null);
+
+                int nItems = c.getCount();
+                c.close();
 
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
                 values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, accountName);
                 values.put(PasswordEntry.Entry.COL_PASSWORD, password);
+                values.put(PasswordEntry.Entry.COL_ORDER, nItems);
 
                 // Insert the new row, returning the primary key value of the new row
                 long newRowId = database.insert(PasswordEntry.Entry.TABLE_NAME, null, values);
@@ -128,6 +134,29 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    protected void updatePasswordEntryItem(final PasswordEntry passwordEntry) {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                // Create a new map of values, where column names are the keys
+                ContentValues values = new ContentValues();
+                values.put(PasswordEntry.Entry.COL__ID, passwordEntry.id);
+                values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, passwordEntry.accountName);
+                values.put(PasswordEntry.Entry.COL_PASSWORD, passwordEntry.password);
+                values.put(PasswordEntry.Entry.COL_ORDER, passwordEntry.order);
+
+                database.update(
+                        PasswordEntry.Entry.TABLE_NAME, values,
+                        PasswordEntry.Entry.COL__ID + " = ?",
+                        new String[]{String.valueOf(passwordEntry.id)});
+
+                return null;
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     protected void deletePasswordEntry(final PasswordEntry passwordEntry) {
         AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
 
@@ -169,6 +198,7 @@ public abstract class DatabaseModel {
         //No-op
     }
 
+
     /**
      * Helper class that actually creates and manages
      * the provider's underlying data repository.
@@ -182,7 +212,8 @@ public abstract class DatabaseModel {
                 " CREATE TABLE " + PasswordEntry.Entry.TABLE_NAME + " (" +
                         " " + PasswordEntry.Entry.COL__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         " " + PasswordEntry.Entry.COL_ACCOUNT_NAME + " TEXT UNIQUE NOT NULL, " +
-                        " " + PasswordEntry.Entry.COL_PASSWORD + " TEXT NOT NULL " +
+                        " " + PasswordEntry.Entry.COL_PASSWORD + " TEXT NOT NULL, " +
+                        " " + PasswordEntry.Entry.COL_ORDER + " INTEGER NOT NULL " +
                         " );";
 
         @SuppressWarnings("unused")

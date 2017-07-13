@@ -38,6 +38,11 @@ public class MainPresenter
         getModel().deletePasswordEntryList(passwordEntryList);
     }
 
+    @Override
+    public void updatePasswordEntryItem(PasswordEntry passwordEntry) {
+        getModel().updatePasswordEntryItem(passwordEntry);
+    }
+
     private void getAllPasswordEntries() {
         getModel().getAllPasswordEntries();
     }

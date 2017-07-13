@@ -13,6 +13,7 @@ public interface MVP {
     }
     interface ProvidedMainPresenterOps extends PresenterOps<RequiredMainViewOps> {
         void deletePasswordEntryList(List<PasswordEntry> passwordEntryList);
+        void updatePasswordEntryItem(PasswordEntry passwordEntry);
     }
     interface RequiredMainPresenterOps extends ContextView {
         void onGetAllPasswordEntries(List<PasswordEntry> passwordEntryList);
@@ -22,6 +23,7 @@ public interface MVP {
     interface ProvidedMainModelOps extends ModelOps<MVP.RequiredMainPresenterOps> {
         void getAllPasswordEntries();
         void deletePasswordEntryList(List<PasswordEntry> passwordEntryList);
+        void updatePasswordEntryItem(PasswordEntry passwordEntry);
     }
 
     /* ****************************************************************************************** */
