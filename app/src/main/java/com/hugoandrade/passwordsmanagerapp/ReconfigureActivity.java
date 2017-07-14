@@ -83,7 +83,7 @@ public class ReconfigureActivity extends AppCompatActivity {
             tvInstructions.setText("Type current PIN");
         }
         else if (configurationStep == 1) {
-            tvInstructions.setText("Type new PIN");
+            tvInstructions.setText("Type new 4-digit PIN");
         }
         else if (configurationStep == 2) {
             tvInstructions.setText("Confirm new PIN");
@@ -126,6 +126,9 @@ public class ReconfigureActivity extends AppCompatActivity {
     private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            if (etCode.getText().toString().trim().length() > 4)
+                return;
+
             if (v == ivKeyboardBackspace && etCode.getText().length() > 0)
                 etCode.setText(TextUtils.substring(etCode.getText(), 0, etCode.getText().length() - 1));
 
@@ -134,8 +137,13 @@ public class ReconfigureActivity extends AppCompatActivity {
                     etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));
 
             if (etCode.getText().toString().trim().length() == 4) {
-                checkTypedPIN();
-
+                android.os.Handler handler = new android.os.Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkTypedPIN();
+                    }
+                }, 100L);
             }
         }
     };

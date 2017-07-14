@@ -3,6 +3,25 @@ package com.hugoandrade.passwordsmanagerapp;
 import java.util.List;
 
 public interface MVP {
+
+    /* ****************************************************************************************** */
+    /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
+    /* ****************************************************************************************** */
+    interface RequiredLoginViewOps extends ContextView {
+        void enableInputFields(boolean areEnabled);
+        void reportMessage(String message);
+        void successfulReset();
+    }
+    interface ProvidedLoginPresenterOps extends PresenterOps<RequiredLoginViewOps> {
+        void resetDatabase();
+    }
+    interface RequiredLoginPresenterOps extends ContextView {
+        void onResetDatabase(boolean wasSuccessfullyDeleted);
+    }
+    interface ProvidedLoginModelOps extends ModelOps<MVP.RequiredLoginPresenterOps> {
+        void resetDatabase();
+    }
+
     /* ****************************************************************************************** */
     /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
     /* ****************************************************************************************** */

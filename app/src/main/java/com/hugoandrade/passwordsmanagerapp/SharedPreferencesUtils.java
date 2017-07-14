@@ -27,4 +27,10 @@ public class SharedPreferencesUtils {
         preferencesEditor.putString(CODE_KEY, newPIN);
         preferencesEditor.apply();
     }
+
+    public static void resetCode(Context applicationContext) {
+        SharedPreferences settings = applicationContext
+                .getSharedPreferences(CODE_SHARED_PREFERENCES_NAME, 0);
+        settings.edit().clear().apply();
+    }
 }

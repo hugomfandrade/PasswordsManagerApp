@@ -67,6 +67,7 @@ public class MainActivity
                     drawable.mutate();
                     drawable.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 }
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
                 break;
             case MODE_DELETE_EDIT:
@@ -77,6 +78,7 @@ public class MainActivity
                 menu.findItem(R.id.action_edit).setVisible(
                         adapterPasswordEntryList.getItemsChecked().size() == 1);
 
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
         return true;
@@ -114,6 +116,10 @@ public class MainActivity
                         adapterPasswordEntryList.getItemsChecked().get(0)), REQUEST_CODE);
                 return true;
             }
+            case android.R.id.home: {
+                enableDefaultMode();
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -131,7 +137,8 @@ public class MainActivity
                 }
                 else if (viewMode == MODE_DELETE_EDIT) {
                     adapterPasswordEntryList.setItemChecked(passwordEntry);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
+                    supportInvalidateOptionsMenu();
                 }
             }
 
@@ -139,7 +146,8 @@ public class MainActivity
             public void onClick(PasswordEntry passwordEntry) {
                 if (viewMode == MODE_DELETE_EDIT) {
                     adapterPasswordEntryList.setItemChecked(passwordEntry);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
+                    supportInvalidateOptionsMenu();
                 }
             }
         });
@@ -184,7 +192,8 @@ public class MainActivity
             viewMode = MODE_DELETE_EDIT;
 
             adapterPasswordEntryList.updateViewMode(viewMode);
-            invalidateOptionsMenu();
+            //invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -193,7 +202,8 @@ public class MainActivity
             viewMode = MODE_DEFAULT;
 
             adapterPasswordEntryList.updateViewMode(viewMode);
-            invalidateOptionsMenu();
+            //invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -202,7 +212,8 @@ public class MainActivity
             viewMode = MODE_REORDER;
 
             adapterPasswordEntryList.updateViewMode(viewMode);
-            invalidateOptionsMenu();
+            //invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 

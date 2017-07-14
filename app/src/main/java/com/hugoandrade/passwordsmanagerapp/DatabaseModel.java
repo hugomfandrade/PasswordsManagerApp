@@ -134,6 +134,26 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    protected void deleteAllPasswordEntries() {
+        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+
+                database.delete(PasswordEntry.Entry.TABLE_NAME, null, null);
+
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                onResetDatabase(aBoolean);
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     protected void updatePasswordEntryItem(final PasswordEntry passwordEntry) {
         AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
 
@@ -208,6 +228,10 @@ public abstract class DatabaseModel {
     }
 
     protected void onUpdatePasswordEntry(PasswordEntry passwordEntry) {
+        //No-op
+    }
+
+    protected void onResetDatabase(boolean wasSuccessfullyDeleted) {
         //No-op
     }
 
