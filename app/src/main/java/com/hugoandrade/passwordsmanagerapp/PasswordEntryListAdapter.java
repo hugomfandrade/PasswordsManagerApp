@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import android.util.Log;
 
 public class PasswordEntryListAdapter
         extends RecyclerView.Adapter<PasswordEntryListAdapter.ViewHolder>
@@ -26,11 +26,12 @@ public class PasswordEntryListAdapter
     @SuppressWarnings("unused")
     private final static String TAG = PasswordEntryListAdapter.class.getSimpleName();
 
-    private final List<MPasswordEntry> passwordEntryList;
-    private int viewMode;
+    private static final String HIDDEN_DEFAULT_TEXT = "Password";
 
-    private OnLongClickListener mOnLongClickListener;
-    private OnClickListener mOnClickListener;
+    private final List<MPasswordEntry> passwordEntryList;
+    private int viewMode = MainActivity.MODE_NONE;
+
+    private OnItemClickListener mOnItemClickListener;
     private OnItemMoveListener mOnItemMoveListener;
     private ItemTouchHelper mItemTouchHelper;
     private RecyclerView recyclerView;
@@ -47,16 +48,28 @@ public class PasswordEntryListAdapter
     }
 
     @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(this);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(this.recyclerView);
+    }
+
+    @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater vi = LayoutInflater.from(parent.getContext());
         return new ViewHolder(vi.inflate(R.layout.list_item_password_entry, parent, false));
     }
 
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final MPasswordEntry passwordEntry = passwordEntryList.get(position);
         holder.tvAccountName.setText(passwordEntry.accountName);
-        holder.etPassword.setText(passwordEntry.password);
+        holder.etPassword.setText(!passwordEntry.isVisible?
+                HIDDEN_DEFAULT_TEXT:
+                passwordEntry.password);
         holder.etPassword.setTransformationMethod(!passwordEntry.isVisible?
                 PasswordTransformationMethod.getInstance() :
                 HideReturnsTransformationMethod.getInstance());
@@ -74,8 +87,8 @@ public class PasswordEntryListAdapter
         holder.llContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnClickListener != null)
-                    mOnClickListener.onClick(passwordEntry);
+                if (mOnItemClickListener != null)
+                    mOnItemClickListener.onClick(passwordEntry);
             }
         });
         holder.llContainer.setOnLongClickListener(new View.OnLongClickListener() {
@@ -83,55 +96,24 @@ public class PasswordEntryListAdapter
             public boolean onLongClick(View v) {
                 if (mItemTouchHelper != null && viewMode == MainActivity.MODE_DEFAULT)
                     mItemTouchHelper.startDrag(holder);
-                if (mOnLongClickListener != null)
-                    mOnLongClickListener.onLongClick(passwordEntry);
+                if (mOnItemClickListener != null)
+                    mOnItemClickListener.onLongClick(passwordEntry);
                 return false;
             }
         });
+        holder.vgPasswordEntry.clearAnimation();
         if (viewMode == MainActivity.MODE_DELETE_EDIT) {
             holder.vgCheckBox.setVisibility(View.VISIBLE);
-            if (passwordEntry.viewMode != viewMode)
-                holder.vgPasswordEntry.startAnimation(
-                        new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 0, 60, 300L));
-
-            else
-                holder.vgPasswordEntry.setPadding(
-                        (int) Options.fromDpToPixel(holder.vgPasswordEntry.getContext(), 60), 0, 0, 0);
+            holder.vgPasswordEntry.setPadding(
+                    (int) Options.fromDpToPixel(holder.vgPasswordEntry.getContext(), 60), 0, 0, 0);
 
         }
-        else if (viewMode == MainActivity.MODE_DEFAULT){
+        else
+        {
             holder.vgCheckBox.setVisibility(View.INVISIBLE);
-            if (passwordEntry.viewMode == MainActivity.MODE_DELETE_EDIT)
-                holder.vgPasswordEntry.startAnimation(new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 60, 0, 300L));
-            else
-                holder.vgPasswordEntry.setPadding(0, 0, 0, 0);
+            holder.vgPasswordEntry.setPadding(0, 0, 0, 0);
         }
-        passwordEntry.viewMode = viewMode;
     }
-
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-
-        this.recyclerView = recyclerView;
-
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(this);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(this.recyclerView);
-    }
-
-    public void setOnLongClickListener(OnLongClickListener listener) {
-        this.mOnLongClickListener = listener;
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mOnClickListener = listener;
-    }
-
-    public void setOnItemMoveListener(OnItemMoveListener listener) {
-        this.mOnItemMoveListener = listener;
-    }
-
     @Override
     public int getItemCount() {
         return passwordEntryList.size();
@@ -143,16 +125,6 @@ public class PasswordEntryListAdapter
             this.passwordEntryList.add(new MPasswordEntry(e, false, false));
 
         notifyDataSetChanged();
-    }
-
-    public void setItemChecked(PasswordEntry passwordEntry) {
-        for (int i = 0 ; i < passwordEntryList.size() ; i++)
-            if (passwordEntryList.get(i) == passwordEntry) {
-                passwordEntryList.get(i).isSelected = !passwordEntryList.get(i).isSelected;
-                ViewHolder holder = ((ViewHolder) recyclerView.findViewHolderForAdapterPosition(i));
-                holder.checkBoxSelected.setChecked(passwordEntryList.get(i).isSelected);
-                break;
-            }
     }
 
     public void removeItem(PasswordEntry passwordEntry) {
@@ -170,6 +142,16 @@ public class PasswordEntryListAdapter
             removeItem(e);
     }
 
+    public void setItemChecked(PasswordEntry passwordEntry) {
+        for (int i = 0 ; i < passwordEntryList.size() ; i++)
+            if (passwordEntryList.get(i) == passwordEntry) {
+                passwordEntryList.get(i).isSelected = !passwordEntryList.get(i).isSelected;
+                ViewHolder holder = ((ViewHolder) recyclerView.findViewHolderForAdapterPosition(i));
+                holder.checkBoxSelected.setChecked(passwordEntryList.get(i).isSelected);
+                break;
+            }
+    }
+
     public List<PasswordEntry> getItemsChecked() {
         List<PasswordEntry> passwordEntryCheckedList = new ArrayList<>();
         for (MPasswordEntry e : passwordEntryList)
@@ -178,26 +160,8 @@ public class PasswordEntryListAdapter
         return passwordEntryCheckedList;
     }
 
-    public List<PasswordEntry> getItems() {
-        List<PasswordEntry> passwordEntryList = new ArrayList<>();
-        for (MPasswordEntry e : this.passwordEntryList)
-            passwordEntryList.add(e);
-        return passwordEntryList;
-    }
-
-    public interface OnLongClickListener {
-        void onLongClick(PasswordEntry passwordEntry);
-    }
-    public interface OnClickListener {
-        void onClick(PasswordEntry passwordEntry);
-    }
-    public interface OnItemMoveListener {
-        void onItemMove(List<PasswordEntry> passwordEntryAffectedList);
-        void onItemDropped();
-    }
-
-
     public void updateViewMode(int viewMode) {
+        int prevViewMode = this.viewMode;
         this.viewMode = viewMode;
 
         switch (this.viewMode) {
@@ -205,32 +169,52 @@ public class PasswordEntryListAdapter
                 for (MPasswordEntry e : passwordEntryList)
                     e.isSelected = false;
 
-                notifyDataSetChanged();
+                for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                    final ViewHolder holder = (ViewHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+                    if (holder != null && holder.getAdapterPosition() != -1) {
+                        MPasswordEntry e = passwordEntryList.get(holder.getAdapterPosition());
+                        holder.vgCheckBox.setVisibility(View.INVISIBLE);
+                        holder.checkBoxSelected.setChecked(e.isSelected);
+                        if (prevViewMode == MainActivity.MODE_DELETE_EDIT)
+                            holder.vgPasswordEntry.startAnimation(
+                                    new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 60, 0, 300L));
+                        else
+                            holder.vgPasswordEntry.setPadding(0, 0, 0, 0);
+                    }
+                }
+                android.os.Handler h = new android.os.Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                }, 300L);
+
                 break;
             case MainActivity.MODE_DELETE_EDIT:
                 for (MPasswordEntry e : passwordEntryList)
                     e.isSelected = false;
 
-                for (int i = 0 ; i < passwordEntryList.size() ; i++) {
-                    ViewHolder holder = ((ViewHolder) recyclerView.findViewHolderForAdapterPosition(i));
-                    holder.checkBoxSelected.setChecked(passwordEntryList.get(i).isSelected);
-                    holder.vgCheckBox.setVisibility(View.VISIBLE);
-                    holder.vgPasswordEntry.startAnimation(
-                            new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 0, 60, 300L));
-                    passwordEntryList.get(i).viewMode = viewMode;
+                for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                    final ViewHolder holder = (ViewHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+                    if (holder != null && holder.getAdapterPosition() != -1) {
+                        MPasswordEntry e = passwordEntryList.get(holder.getAdapterPosition());
+                        holder.vgCheckBox.setVisibility(View.VISIBLE);
+                        holder.checkBoxSelected.setChecked(e.isSelected);
+                        holder.vgPasswordEntry.startAnimation(
+                                new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 0, 60, 300L));
+                    }
                 }
                 break;
             case MainActivity.MODE_REORDER:
-                // This code below overrides the ItemMove Animation while dragging and therefore
-                // doesnt call onItemMove.
-                // Solutions: Comment this code OR sort collections after each onItemMove
-                for (int i = 0 ; i < passwordEntryList.size() ; i++) {
-                    ViewHolder holder = ((ViewHolder) recyclerView.findViewHolderForAdapterPosition(i));
-                    holder.vgCheckBox.setVisibility(View.INVISIBLE);
-                    holder.vgPasswordEntry.startAnimation(
-                            new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 60, 0, 300L));
-                    passwordEntryList.get(i).viewMode = viewMode;
-                }/**/
+                for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                    final ViewHolder holder = (ViewHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
+                    if (holder != null && holder.getAdapterPosition() != -1) {
+                        holder.vgCheckBox.setVisibility(View.INVISIBLE);
+                        holder.vgPasswordEntry.startAnimation(
+                                new MyAnimator(holder.checkBoxSelected, holder.vgPasswordEntry, 60, 0, 300L));
+                    }
+                }
                 break;
         }
     }
@@ -268,9 +252,27 @@ public class PasswordEntryListAdapter
     }
 
     @Override
-    public void onAnimationEnd() {
+    public void onItemDropped(int position) {
+        notifyDataSetChanged();
         if (mOnItemMoveListener != null)
             mOnItemMoveListener.onItemDropped();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
+    }
+
+    public void setOnItemMoveListener(OnItemMoveListener listener) {
+        this.mOnItemMoveListener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onLongClick(PasswordEntry passwordEntry);
+        void onClick(PasswordEntry passwordEntry);
+    }
+    public interface OnItemMoveListener {
+        void onItemMove(List<PasswordEntry> passwordEntryAffectedList);
+        void onItemDropped();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -343,9 +345,8 @@ public class PasswordEntryListAdapter
         }
     }
     private class MPasswordEntry extends PasswordEntry {
-
-        public int viewMode = -1;
         public boolean isVisible, isSelected;
+
         public MPasswordEntry(PasswordEntry passwordEntry, boolean isVisible, boolean isSelected) {
             super(passwordEntry.id, passwordEntry.accountName, passwordEntry.password, passwordEntry.order);
             this.isVisible = isVisible;

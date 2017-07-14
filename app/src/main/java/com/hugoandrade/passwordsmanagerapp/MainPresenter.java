@@ -15,12 +15,12 @@ public class MainPresenter
     @Override
     public void onCreate(MVP.RequiredMainViewOps view) {
         super.onCreate(view, MainModel.class, this);
+
+        getAllPasswordEntries();
     }
 
     @Override
-    public void onResume() {
-        getAllPasswordEntries();
-    }
+    public void onResume() { }
 
     @Override
     public void onConfigurationChange(MVP.RequiredMainViewOps view) { }

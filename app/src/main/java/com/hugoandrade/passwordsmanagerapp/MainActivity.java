@@ -1,6 +1,7 @@
 package com.hugoandrade.passwordsmanagerapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -9,7 +10,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,6 +23,7 @@ public class MainActivity
 
     private static final int REQUEST_CODE = 1;
 
+    public static final int MODE_NONE = -1;
     public static final int MODE_DEFAULT = 1;
     public static final int MODE_DELETE_EDIT = 2;
     public static final int MODE_REORDER = 3;
@@ -73,7 +74,8 @@ public class MainActivity
                 menu.findItem(R.id.action_delete).setVisible(
                         adapterPasswordEntryList.getItemsChecked().size() != 0);
                 //Disable edit option for now
-                menu.findItem(R.id.action_edit).setVisible(false);
+                menu.findItem(R.id.action_edit).setVisible(
+                        adapterPasswordEntryList.getItemsChecked().size() == 1);
 
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
@@ -89,8 +91,27 @@ public class MainActivity
                 return true;
             }
             case R.id.action_delete: {
-                getPresenter().deletePasswordEntryList(
-                        adapterPasswordEntryList.getItemsChecked());
+                String title = "Delete Password-Entry";
+                String message = "Are you sure you want to delete it?";
+                SimpleBuilderDialog builderDialog =
+                        new SimpleBuilderDialog(getActivityContext(), title, message);
+                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResult() {
+                    @Override
+                    public void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result) {
+                        if (result == SimpleBuilderDialog.YES) {
+                            getPresenter().deletePasswordEntryList(
+                                    adapterPasswordEntryList.getItemsChecked());
+                        }
+                        else
+                            dialog.dismiss();
+                    }
+                });
+                return true;
+            }
+            case R.id.action_edit: {
+                startActivityForResult(AddPasswordEntryActivity.makeIntent(
+                        MainActivity.this,
+                        adapterPasswordEntryList.getItemsChecked().get(0)), REQUEST_CODE);
                 return true;
             }
         }
@@ -101,7 +122,7 @@ public class MainActivity
     private void initializeViews() {
         rvPasswordEntry = (RecyclerView) findViewById(R.id.rv_password_entry);
         adapterPasswordEntryList = new PasswordEntryListAdapter(viewMode);
-        adapterPasswordEntryList.setOnLongClickListener(new PasswordEntryListAdapter.OnLongClickListener() {
+        adapterPasswordEntryList.setOnItemClickListener(new PasswordEntryListAdapter.OnItemClickListener() {
             @Override
             public void onLongClick(PasswordEntry passwordEntry) {
                 if (viewMode == MODE_DEFAULT) {
@@ -113,8 +134,7 @@ public class MainActivity
                     invalidateOptionsMenu();
                 }
             }
-        });
-        adapterPasswordEntryList.setOnClickListener(new PasswordEntryListAdapter.OnClickListener() {
+
             @Override
             public void onClick(PasswordEntry passwordEntry) {
                 if (viewMode == MODE_DELETE_EDIT) {
@@ -127,7 +147,6 @@ public class MainActivity
             @Override
             public void onItemMove(List<PasswordEntry> passwordEntryAffectedList) {
                 enableReorderMode();
-                //Log.e(TAG, "------------------");for (int i = 0 ; i < adapterPasswordEntryList.getItems().size() ; i++) Log.e(TAG, adapterPasswordEntryList.getItems().get(i).accountName + ": " + Integer.toString(adapterPasswordEntryList.getItems().get(i).order));
                 for (PasswordEntry e : passwordEntryAffectedList)
                     getPresenter().updatePasswordEntryItem(e);
             }
@@ -135,7 +154,6 @@ public class MainActivity
             public void onItemDropped() {
                 if (viewMode == MODE_REORDER) {
                     enableDefaultMode();
-                    //for (int i = 0 ; i < adapterPasswordEntryList.getItems().size() ; i++) Log.e(TAG, adapterPasswordEntryList.getItems().get(i).accountName);
                 }
             }
         });

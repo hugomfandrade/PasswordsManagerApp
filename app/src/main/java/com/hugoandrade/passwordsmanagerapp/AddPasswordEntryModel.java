@@ -38,8 +38,19 @@ public class AddPasswordEntryModel extends DatabaseModel implements MVP.Provided
     }
 
     @Override
+    public void editPasswordEntry(PasswordEntry passwordEntry) {
+        super.updatePasswordEntryItem(passwordEntry);
+    }
+
+    @Override
     protected void onInsertPasswordEntry(PasswordEntry passwordEntry) {
         if (mPresenter != null && mPresenter.get() != null)
             mPresenter.get().onInsertPasswordEntry(passwordEntry);
+    }
+
+    @Override
+    protected void onUpdatePasswordEntry(PasswordEntry passwordEntry) {
+        if (mPresenter != null && mPresenter.get() != null)
+            mPresenter.get().onUpdatePasswordEntry(passwordEntry);
     }
 }

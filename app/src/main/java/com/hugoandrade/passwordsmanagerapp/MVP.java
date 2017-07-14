@@ -36,11 +36,14 @@ public interface MVP {
     }
     interface ProvidedAddPasswordEntryPresenterOps extends PresenterOps<RequiredAddPasswordEntryViewOps> {
         void addPasswordEntry(String accountName, String password);
+        void editPasswordEntry(PasswordEntry passwordEntry, String accountName, String password);
     }
     interface RequiredAddPasswordEntryPresenterOps extends ContextView {
         void onInsertPasswordEntry(PasswordEntry passwordEntry);
+        void onUpdatePasswordEntry(PasswordEntry passwordEntry);
     }
     interface ProvidedAddPasswordEntryModelOps extends ModelOps<MVP.RequiredAddPasswordEntryPresenterOps> {
         void addPasswordEntry(String accountName, String password);
+        void editPasswordEntry(PasswordEntry passwordEntry);
     }
 }

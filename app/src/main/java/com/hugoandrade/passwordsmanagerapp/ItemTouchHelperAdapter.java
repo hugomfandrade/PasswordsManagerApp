@@ -42,5 +42,5 @@ public interface ItemTouchHelperAdapter {
      */
     boolean onItemMove(int fromPosition, int toPosition);
 
-    void onAnimationEnd();
+    void onItemDropped(int position);
 }

@@ -135,10 +135,10 @@ public abstract class DatabaseModel {
     }
 
     protected void updatePasswordEntryItem(final PasswordEntry passwordEntry) {
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+        AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
 
             @Override
-            protected Void doInBackground(Void... params) {
+            protected PasswordEntry doInBackground(Void... params) {
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
                 values.put(PasswordEntry.Entry.COL__ID, passwordEntry.id);
@@ -146,12 +146,21 @@ public abstract class DatabaseModel {
                 values.put(PasswordEntry.Entry.COL_PASSWORD, passwordEntry.password);
                 values.put(PasswordEntry.Entry.COL_ORDER, passwordEntry.order);
 
-                database.update(
+                int nRowsAffected = database.update(
                         PasswordEntry.Entry.TABLE_NAME, values,
                         PasswordEntry.Entry.COL__ID + " = ?",
                         new String[]{String.valueOf(passwordEntry.id)});
 
-                return null;
+                if (nRowsAffected == 0)
+                    return null;
+                else
+                    return passwordEntry;
+            }
+
+            @Override
+            protected void onPostExecute(PasswordEntry passwordEntry) {
+                super.onPostExecute(passwordEntry);
+                onUpdatePasswordEntry(passwordEntry);
             }
         };
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -195,6 +204,10 @@ public abstract class DatabaseModel {
     }
 
     protected void onDeletePasswordEntry(PasswordEntry passwordEntry) {
+        //No-op
+    }
+
+    protected void onUpdatePasswordEntry(PasswordEntry passwordEntry) {
         //No-op
     }
 

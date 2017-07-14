@@ -38,10 +38,28 @@ public class AddPasswordEntryPresenter
     }
 
     @Override
+    public void editPasswordEntry(PasswordEntry passwordEntry, String accountName, String password) {
+        getView().enableInputFields(false);
+        passwordEntry.accountName = accountName;
+        passwordEntry.password = password;
+        getModel().editPasswordEntry(passwordEntry);
+    }
+
+    @Override
     public void onInsertPasswordEntry(PasswordEntry passwordEntry) {
         if (passwordEntry == null) {
             getView().enableInputFields(true);
-            getView().reportMessage("Addition failed.");
+            getView().reportMessage("Addition failed");
+        }
+        else
+            getView().successfulAddPasswordEntry();
+    }
+
+    @Override
+    public void onUpdatePasswordEntry(PasswordEntry passwordEntry) {
+        if (passwordEntry == null) {
+            getView().enableInputFields(true);
+            getView().reportMessage("Edition failed");
         }
         else
             getView().successfulAddPasswordEntry();

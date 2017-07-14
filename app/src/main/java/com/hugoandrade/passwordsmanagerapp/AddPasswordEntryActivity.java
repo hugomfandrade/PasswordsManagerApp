@@ -2,6 +2,7 @@ package com.hugoandrade.passwordsmanagerapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,13 +18,24 @@ public class AddPasswordEntryActivity
                                 AddPasswordEntryPresenter>
     implements MVP.RequiredAddPasswordEntryViewOps {
 
-    private static final int REQUEST_CODE = 1;
+    private static final String PASSWORD_ENTRY = "PasswordEntry";
+    private static final int MODE_ADD = 0;
+    private static final int MODE_EDIT = 1;
 
     private EditText etAccountName, etPassword;
     private TextView tvAddPasswordEntry;
 
+    private PasswordEntry passwordEntry;
+    private int mode;
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, AddPasswordEntryActivity.class);
+    }
+
+    public static Intent makeIntent(Context context, PasswordEntry passwordEntry) {
+        Intent intent = new Intent(context, AddPasswordEntryActivity.class);
+        intent.putExtra(PASSWORD_ENTRY, passwordEntry);
+        return intent;
     }
 
     @Override
@@ -34,19 +46,19 @@ public class AddPasswordEntryActivity
 
         initializeViews();
 
+        if (getIntent() != null && getIntent().getParcelableExtra(PASSWORD_ENTRY) != null) {
+            mode = MODE_EDIT;
+            passwordEntry = getIntent().getParcelableExtra(PASSWORD_ENTRY);
+            etAccountName.setText(passwordEntry.accountName);
+            etAccountName.setSelection(etAccountName.getText().length());
+            etPassword.setText(passwordEntry.password);
+            tvAddPasswordEntry.setText("Save");
+        }
+        else {
+            mode = MODE_ADD;
+        }
+
         super.onCreate(AddPasswordEntryPresenter.class, this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getPresenter().onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        getPresenter().onPause();
     }
 
     @Override
@@ -57,7 +69,7 @@ public class AddPasswordEntryActivity
 
     private void initializeViews() {
         etAccountName = (EditText) findViewById(R.id.et_account_name);
-        etPassword   = (EditText) findViewById(R.id.et_password);
+        etPassword    = (EditText) findViewById(R.id.et_password);
         etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -75,9 +87,17 @@ public class AddPasswordEntryActivity
         tvAddPasswordEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getPresenter().addPasswordEntry(
-                        etAccountName.getText().toString(),
-                        etPassword.getText().toString());
+                if (mode == MODE_ADD) {
+                    getPresenter().addPasswordEntry(
+                            etAccountName.getText().toString(),
+                            etPassword.getText().toString());
+                }
+                else if (mode == MODE_EDIT) {
+                    getPresenter().editPasswordEntry(
+                            passwordEntry,
+                            etAccountName.getText().toString(),
+                            etPassword.getText().toString());
+                }
             }
         });
 
@@ -88,10 +108,10 @@ public class AddPasswordEntryActivity
     private void checkInputFields() {
         if (!etAccountName.getText().toString().isEmpty() && !etPassword.getText().toString().isEmpty()) {
             tvAddPasswordEntry.setClickable(true);
-            //tvAddPasswordEntry.setTextColor(Color.WHITE);
+            tvAddPasswordEntry.setBackground(null);
         } else {
             tvAddPasswordEntry.setClickable(false);
-            //tvAddPasswordEntry.setTextColor(Color.parseColor("#3dffffff"));
+            tvAddPasswordEntry.setBackgroundColor(Color.parseColor("#3dffffff"));
         }
     }
 
