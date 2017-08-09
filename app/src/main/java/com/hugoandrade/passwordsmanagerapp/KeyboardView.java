@@ -268,7 +268,7 @@ public class KeyboardView extends LinearLayout {
                 else if (position == 9) {
                     vKey = view.findViewById(R.id.tv_keyboard_bottom_left);
                     if (bottomStartButtonString == null)
-                        vKey.setVisibility(GONE);
+                        ((View) vKey.getParent()).setVisibility(GONE);
                     else {
                         ((TextView) vKey).setText(bottomStartButtonString);
                     }

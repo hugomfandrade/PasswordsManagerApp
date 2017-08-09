@@ -132,7 +132,7 @@ public class ReconfigurePINActivity extends AppCompatActivity {
             }
         };
         android.os.Handler handler = new android.os.Handler();
-        handler.postDelayed(runnable, 100L);
+        handler.postDelayed(runnable, 200L);
     }
 
     private void enableInputFields(boolean areEnabled) {

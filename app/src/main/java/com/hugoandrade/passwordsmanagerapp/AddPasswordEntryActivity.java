@@ -96,18 +96,6 @@ public class AddPasswordEntryActivity
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (abortAppOnPause) {
-            etEntryName.setVisibility(View.INVISIBLE);
-            etAccountName.setVisibility(View.INVISIBLE);
-            etPassword.setVisibility(View.INVISIBLE);
-            tvAddPasswordEntry.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
 
@@ -134,7 +122,7 @@ public class AddPasswordEntryActivity
     private void initializeUI() {
         setContentView(R.layout.activity_add_password_entry);
 
-        etEntryName = (EditText) findViewById(R.id.et_entry_name);
+        etEntryName   = (EditText) findViewById(R.id.et_entry_name);
         etAccountName = (EditText) findViewById(R.id.et_account_name);
         etPassword    = (EditText) findViewById(R.id.et_password);
         etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -193,7 +181,6 @@ public class AddPasswordEntryActivity
             mode = MODE_ADD;
 
             addRemoveAccountNameField(false);
-            etEntryName.setSelection(etEntryName.getText().length());
         }
     }
 

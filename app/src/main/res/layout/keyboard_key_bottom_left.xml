@@ -5,6 +5,16 @@
     android:layout_height="match_parent"
     android:gravity="center" >
 
+    <com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:corner_radius="200dp"
+        app:background_color="@android:color/transparent"
+        app:background_color_selected="@android:color/transparent"
+        app:border_color="@android:color/transparent">
+
         <TextView
             android:id="@+id/tv_keyboard_bottom_left"
             android:layout_width="match_parent"
@@ -13,5 +23,7 @@
             android:padding="10dp"
             android:background="?android:attr/selectableItemBackground"
             android:textColor="@color/colorAccent"/>
+
+    </com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout>
 
 </LinearLayout>

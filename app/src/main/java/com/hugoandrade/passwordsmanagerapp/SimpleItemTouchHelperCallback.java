@@ -66,7 +66,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         }
 
         // Notify the adapter of the move
-        return mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+        mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
+        return true;
     }
 
     @Override
@@ -82,8 +83,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
                 // Let the view holder know that this item is being moved or dragged
                 ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
                 itemViewHolder.onItemSelected();
+                mAdapter.onItemSelected(viewHolder.getAdapterPosition());
             }
         }
+
 
         super.onSelectedChanged(viewHolder, actionState);
     }

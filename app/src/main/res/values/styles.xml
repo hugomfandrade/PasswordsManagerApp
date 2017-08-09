@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionMenuTextColor">#fff</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -24,7 +25,7 @@
     </style>
     <style name="ActionBarThemeOverlay.Popup" >
         <item name="android:background">#fff</item>
-        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">#fff</item>
         <item name="android:textSize">16sp</item>
     </style>
     <style name="ActionBarThemeOverlay.TitleText" >
