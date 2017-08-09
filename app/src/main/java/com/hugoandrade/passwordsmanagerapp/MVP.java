@@ -7,24 +7,6 @@ public interface MVP {
     /* ****************************************************************************************** */
     /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
     /* ****************************************************************************************** */
-    interface RequiredLoginViewOps extends ContextView {
-        void enableInputFields(boolean areEnabled);
-        void reportMessage(String message);
-        void successfulReset();
-    }
-    interface ProvidedLoginPresenterOps extends PresenterOps<RequiredLoginViewOps> {
-        void resetDatabase();
-    }
-    interface RequiredLoginPresenterOps extends ContextView {
-        void onResetDatabase(boolean wasSuccessfullyDeleted);
-    }
-    interface ProvidedLoginModelOps extends ModelOps<MVP.RequiredLoginPresenterOps> {
-        void resetDatabase();
-    }
-
-    /* ****************************************************************************************** */
-    /** For Main Activity {@link com.hugoandrade.passwordsmanagerapp} **/
-    /* ****************************************************************************************** */
     interface RequiredMainViewOps extends ContextView {
         void populatePasswordEntries(List<PasswordEntry> passwordEntryList);
         void removePasswordEntryListFromListAdapter(List<PasswordEntry> passwordEntryList);
@@ -51,18 +33,18 @@ public interface MVP {
     interface RequiredAddPasswordEntryViewOps extends ContextView {
         void enableInputFields(boolean areEnabled);
         void reportMessage(String message);
-        void successfulAddPasswordEntry();
+        void successfulAddPasswordEntry(PasswordEntry passwordEntry);
     }
     interface ProvidedAddPasswordEntryPresenterOps extends PresenterOps<RequiredAddPasswordEntryViewOps> {
-        void addPasswordEntry(String accountName, String password);
-        void editPasswordEntry(PasswordEntry passwordEntry, String accountName, String password);
+        void addPasswordEntry(String entryName, String accountName, String password);
+        void editPasswordEntry(PasswordEntry passwordEntry, String entryName, String accountName, String password);
     }
     interface RequiredAddPasswordEntryPresenterOps extends ContextView {
         void onInsertPasswordEntry(PasswordEntry passwordEntry);
         void onUpdatePasswordEntry(PasswordEntry passwordEntry);
     }
     interface ProvidedAddPasswordEntryModelOps extends ModelOps<MVP.RequiredAddPasswordEntryPresenterOps> {
-        void addPasswordEntry(String accountName, String password);
+        void addPasswordEntry(String entryName, String accountName, String password);
         void editPasswordEntry(PasswordEntry passwordEntry);
     }
 }

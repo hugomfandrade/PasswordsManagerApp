@@ -2,68 +2,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="@dimen/activity_horizontal_margin"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     android:id="@+id/layout_activity_login"
     android:background="@color/colorPrimary">
 
+
     <LinearLayout
+        android:visibility="visible"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/et_code"
-            android:padding="8dp"
-            android:background="#00ffffff"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:inputType="numberPassword"
-            android:textSize="26sp"
-            android:textColor="#fff"
-            android:enabled="false"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingEnd="30dp"
-            android:paddingStart="30dp">
+            android:padding="40dp"
+            android:gravity="center">
 
-            <include layout="@layout/keyboard"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_pin_display"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+
         </LinearLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:padding="8dp" >
 
-        <TextView
-            android:id="@+id/tv_reconfigure"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="reconfigure"
-            android:textColor="#fff"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/tv_reset"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="reset"
-            android:textColor="#fff"
-            android:gravity="center" />
+        <com.hugoandrade.passwordsmanagerapp.KeyboardView
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:id="@+id/kb_keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            app:bottom_start_button="reconfigure"/>
 
     </LinearLayout>
-
 </RelativeLayout>

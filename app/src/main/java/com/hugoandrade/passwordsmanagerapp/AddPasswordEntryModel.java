@@ -33,8 +33,8 @@ public class AddPasswordEntryModel extends DatabaseModel implements MVP.Provided
     }
 
     @Override
-    public void addPasswordEntry(String accountName, String password) {
-        super.insertPasswordEntry(accountName, password);
+    public void addPasswordEntry(String entryName, String accountName, String password) {
+        super.insertPasswordEntry(entryName, accountName, password);
     }
 
     @Override

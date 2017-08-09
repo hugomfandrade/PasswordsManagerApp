@@ -32,14 +32,15 @@ public class AddPasswordEntryPresenter
     public void onConfigurationChange(MVP.RequiredAddPasswordEntryViewOps view) { }
 
     @Override
-    public void addPasswordEntry(String accountName, String password) {
+    public void addPasswordEntry(String entryName, String accountName, String password) {
         getView().enableInputFields(false);
-        getModel().addPasswordEntry(accountName, password);
+        getModel().addPasswordEntry(entryName, accountName, password);
     }
 
     @Override
-    public void editPasswordEntry(PasswordEntry passwordEntry, String accountName, String password) {
+    public void editPasswordEntry(PasswordEntry passwordEntry, String entryName, String accountName, String password) {
         getView().enableInputFields(false);
+        passwordEntry.entryName = entryName;
         passwordEntry.accountName = accountName;
         passwordEntry.password = password;
         getModel().editPasswordEntry(passwordEntry);
@@ -52,7 +53,7 @@ public class AddPasswordEntryPresenter
             getView().reportMessage("Addition failed");
         }
         else
-            getView().successfulAddPasswordEntry();
+            getView().successfulAddPasswordEntry(passwordEntry);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class AddPasswordEntryPresenter
             getView().reportMessage("Edition failed");
         }
         else
-            getView().successfulAddPasswordEntry();
+            getView().successfulAddPasswordEntry(passwordEntry);
     }
 
     @Override

@@ -14,6 +14,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.annotation.ColorInt;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -214,6 +215,30 @@ public class RoundedCornerLayout extends LinearLayout {
         setBackground(makeSelectorBackgroundDrawable(
                 backgroundColor, backgroundColorSelected, borderColor, cornerRadius,
                 new float[] {elevationStart, elevationTop, elevationEnd, elevationBottom}));
+    }
+
+    public void setPercentileHeight(int percentileHeight) {
+        this.percentileHeight = percentileHeight;
+        if (this.percentileHeight < 0)
+            this.percentileHeight = 0;
+        else if (percentileHeight > 100)
+            this.percentileHeight = 100;
+
+        this.percentileWidth = Float.NaN;
+
+        requestLayout();
+    }
+
+    public void setPercentileWidth(int percentileWidth) {
+        this.percentileWidth = percentileWidth;
+        if (this.percentileWidth < 0)
+            this.percentileWidth = 0;
+        else if (percentileWidth > 100)
+            this.percentileWidth = 100;
+
+        this.percentileHeight = Float.NaN;
+
+        requestLayout();
     }
 
     public void setBackgroundSelectedColor(@ColorInt int color) {

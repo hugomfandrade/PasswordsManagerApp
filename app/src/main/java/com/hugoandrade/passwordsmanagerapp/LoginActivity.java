@@ -1,163 +1,112 @@
 package com.hugoandrade.passwordsmanagerapp;
 
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class LoginActivity
-        extends GenericActivity<MVP.RequiredLoginViewOps, MVP.ProvidedLoginPresenterOps, LoginPresenter>
-        implements MVP.RequiredLoginViewOps {
+public class LoginActivity extends AppCompatActivity {
 
     @SuppressWarnings("unused") private final static String TAG = LoginActivity.class.getSimpleName();
 
     private static final int REQUEST_CODE = 1;
 
-    private EditText etCode;
-    private List<TextView> tvKeyboardKeyList = new ArrayList<>();
-    private ImageView ivKeyboardBackspace;
+    private KeyboardView keyboardView;
+    private PINDisplayListAdapter mPINDisplayAdapter;
+
+    public static Intent makeIntent(Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_login);
-
-        initializeViews();
+        initializeUI();
 
         if (SharedPreferencesUtils.getCode(this) == null)
-            startActivityForResult(
-                    ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
-
-        super.onCreate(LoginPresenter.class, this);
+            reconfigurePIN();
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void initializeViews() {
-        etCode = (EditText) findViewById(R.id.et_code);
-        etCode.setText("");
-        TextView tvReconfigure = (TextView) findViewById(R.id.tv_reconfigure);
-        TextView tvReset = (TextView) findViewById(R.id.tv_reset);
+    private void initializeUI() {
 
-        tvKeyboardKeyList.clear();
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_0).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_1).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_2).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_3).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_4).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_5).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_6).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_7).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_8).findViewById(R.id.tv_keyboard));
-        tvKeyboardKeyList.add((TextView) findViewById(R.id.layout_keyboard_key_9).findViewById(R.id.tv_keyboard));
-        ivKeyboardBackspace = (ImageView) findViewById(R.id.iv_keyboard_backspace);
+        setContentView(R.layout.activity_login);
 
-        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-            tvKeyboardKeyList.get(i).setText(String.valueOf(i));
+        RecyclerView rvPINDisplay = (RecyclerView) findViewById(R.id.rv_pin_display);
+        mPINDisplayAdapter = new PINDisplayListAdapter();
+        rvPINDisplay.setLayoutManager(new LinearLayoutManager(this, OrientationHelper.HORIZONTAL, false));
+        rvPINDisplay.setAdapter(mPINDisplayAdapter);
 
-        for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-            tvKeyboardKeyList.get(i).setOnClickListener(mOnKeyboardKeyClicked);
-
-        ivKeyboardBackspace.setOnClickListener(mOnKeyboardKeyClicked);
-
-        assert tvReconfigure != null;
-        tvReconfigure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(
-                        ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
-            }
-        });
-        assert tvReset != null;
-        tvReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = "Reset";
-                String message = "Are you sure you want to reset? You will lose all data.";
-                SimpleBuilderDialog builderDialog =
-                        new SimpleBuilderDialog(LoginActivity.this, title, message);
-                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResult() {
-                    @Override
-                    public void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result) {
-                        if (result == SimpleBuilderDialog.YES)
-                            getPresenter().resetDatabase();
-                        else
-                            dialog.dismiss();
-                    }
-                });
-            }
-        });
+        keyboardView = (KeyboardView) findViewById(R.id.kb_keyboard);
+        keyboardView.setOnKeyboardKeyListener(mOnKeyboardKeyClicked);
     }
 
-    @Override
-    public void enableInputFields(boolean areEnabled) {
-        for (int i = 0; i < tvKeyboardKeyList.size(); i++)
-            tvKeyboardKeyList.get(i).setOnClickListener(areEnabled? mOnKeyboardKeyClicked : null);
-
-        ivKeyboardBackspace.setOnClickListener(areEnabled? mOnKeyboardKeyClicked : null);
+    private void enableInputFields(boolean areEnabled) {
+        keyboardView.setOnKeyboardKeyListener(areEnabled? mOnKeyboardKeyClicked : null);
     }
 
-    @Override
-    public void successfulReset() {
-        SharedPreferencesUtils.resetCode(this);
-        startActivityForResult(
-                ReconfigureActivity.makeIntent(LoginActivity.this), REQUEST_CODE);
-    }
-
-    public void successfulLogin() {
+    private void successfulLogin() {
         startActivity(MainActivity.makeIntent(this));
         finish();
     }
 
-    private View.OnClickListener mOnKeyboardKeyClicked = new View.OnClickListener() {
+    private void reconfigurePIN() {
+        startActivityForResult(
+                ReconfigurePINActivity.makeIntent(LoginActivity.this),
+                REQUEST_CODE);
+    }
+
+    private void validatePin(final String mPIN) {
+        enableInputFields(false);
+        android.os.Handler handler = new android.os.Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String code = SharedPreferencesUtils.getCode(LoginActivity.this);
+                if (code == null || !code.equals(mPIN)) {
+                    enableInputFields(true);
+                    reportMessage("Wrong PIN");
+                    mPINDisplayAdapter.reset();
+                }
+                else {
+                    successfulLogin();
+                }
+            }
+        }, 100L);
+    }
+
+    private KeyboardView.OnKeyboardKeyListener mOnKeyboardKeyClicked
+            = new KeyboardView.OnKeyboardKeyListener() {
         @Override
-        public void onClick(View v) {
-            if (etCode.getText().toString().trim().length() > 4)
-                return;
-
-            if (v == ivKeyboardBackspace && etCode.getText().length() > 0)
-                etCode.setText(TextUtils.substring(etCode.getText(), 0, etCode.getText().length() - 1));
-
-            for (int i = 0 ; i < tvKeyboardKeyList.size() ; i++)
-                if (v == tvKeyboardKeyList.get(i))
-                    etCode.setText(TextUtils.concat(etCode.getText(), String.valueOf(i)));
-
-            if (etCode.getText().toString().trim().length() == 4) {
-                enableInputFields(false);
-                android.os.Handler handler = new android.os.Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        String code = SharedPreferencesUtils.getCode(LoginActivity.this);
-                        if (code == null || !code.equals(etCode.getText().toString().trim())) {
-                            enableInputFields(true);
-                            reportMessage("Wrong PIN");
-                            etCode.setText("");
-                        }
-                        else {
-                            successfulLogin();
-                        }
-                    }
-                }, 100L);
+        public void onKeyboardKey(int keyboardKey) {
+            if (keyboardKey == KeyboardView.KEY_BOTTOM_LEFT)
+                reconfigurePIN();
+            else if (keyboardKey == KeyboardView.KEY_DELETE)
+                mPINDisplayAdapter.delete();
+            else {
+                mPINDisplayAdapter.add(keyboardKey);
+                String mPIN = mPINDisplayAdapter.getPIN();
+                if (mPIN.length() == 4)
+                    validatePin(mPIN);
             }
         }
     };
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            etCode.setText("");
+            mPINDisplayAdapter.reset();
         }
     }
 
     public void reportMessage(String message) {
         Options.showSnackBar(findViewById(R.id.layout_activity_login), message);
     }
-
 }

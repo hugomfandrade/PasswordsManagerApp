@@ -26,4 +26,8 @@
         <attr name="percentile_width" format="float"/>
     </declare-styleable>
 
+    <declare-styleable name="KeyboardView">
+        <attr name="bottom_start_button" format="string"/>
+    </declare-styleable>
+
 </resources>

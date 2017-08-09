@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
@@ -137,11 +137,36 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <View
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_margin="2dp"
-            android:layout_weight="1" />
+            android:layout_weight="1">
+
+            <com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:percentile_height="100"
+                app:background_color="@android:color/transparent"
+                app:background_color_selected="@android:color/transparent"
+                app:border_color="@android:color/transparent"
+                app:border_elevation="4dp">
+
+                <TextView
+                    android:id="@+id/tv_keyboard_reconfigure"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="2dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:src="@drawable/ic_backspace"
+                    android:text="Reconfigure"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold" />
+
+            </com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"

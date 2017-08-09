@@ -60,7 +60,9 @@ public abstract class DatabaseModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    protected void insertPasswordEntry(final String accountName, final String password) {
+    protected void insertPasswordEntry(final String entryName,
+                                       final String accountName,
+                                       final String password) {
         AsyncTask<Void, Void, PasswordEntry> task = new AsyncTask<Void, Void, PasswordEntry>() {
 
             @Override
@@ -73,6 +75,7 @@ public abstract class DatabaseModel {
 
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
+                values.put(PasswordEntry.Entry.COL_ENTRY_NAME, entryName);
                 values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, accountName);
                 values.put(PasswordEntry.Entry.COL_PASSWORD, password);
                 values.put(PasswordEntry.Entry.COL_ORDER, nItems);
@@ -162,6 +165,7 @@ public abstract class DatabaseModel {
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
                 values.put(PasswordEntry.Entry.COL__ID, passwordEntry.id);
+                values.put(PasswordEntry.Entry.COL_ENTRY_NAME, passwordEntry.entryName);
                 values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, passwordEntry.accountName);
                 values.put(PasswordEntry.Entry.COL_PASSWORD, passwordEntry.password);
                 values.put(PasswordEntry.Entry.COL_ORDER, passwordEntry.order);
@@ -243,12 +247,13 @@ public abstract class DatabaseModel {
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "PasswordManagerApp";
-        private static final int DATABASE_VERSION = 1;
+        private static final int DATABASE_VERSION = 2;
 
         private static final String CREATE_DB_TABLE_PASSWORD_ENTRY =
                 " CREATE TABLE " + PasswordEntry.Entry.TABLE_NAME + " (" +
                         " " + PasswordEntry.Entry.COL__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        " " + PasswordEntry.Entry.COL_ACCOUNT_NAME + " TEXT UNIQUE NOT NULL, " +
+                        " " + PasswordEntry.Entry.COL_ENTRY_NAME + " TEXT UNIQUE NOT NULL, " +
+                        " " + PasswordEntry.Entry.COL_ACCOUNT_NAME + " TEXT NULL, " +
                         " " + PasswordEntry.Entry.COL_PASSWORD + " TEXT NOT NULL, " +
                         " " + PasswordEntry.Entry.COL_ORDER + " INTEGER NOT NULL " +
                         " );";

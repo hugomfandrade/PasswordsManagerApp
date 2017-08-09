@@ -3,15 +3,27 @@ package com.hugoandrade.passwordsmanagerapp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.ActionMode;
+import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,10 +40,16 @@ public class MainActivity
     public static final int MODE_DELETE_EDIT = 2;
     public static final int MODE_REORDER = 3;
 
+    public static final String ABORT_APP = "AbortApp";
+
     private int viewMode = 0;
 
     private RecyclerView rvPasswordEntry;
+    private TextView tvEmptyMessage;
+
     private PasswordEntryListAdapter adapterPasswordEntryList;
+
+    private boolean abortAppOnPause = true;
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, MainActivity.class);
@@ -41,6 +59,10 @@ public class MainActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE);
+
         setContentView(R.layout.activity_main);
 
         initializeViews();
@@ -48,6 +70,15 @@ public class MainActivity
         enableDefaultMode();
 
         super.onCreate(MainPresenter.class, this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (abortAppOnPause) {
+            finish();
+        }
     }
 
     @Override
@@ -88,6 +119,7 @@ public class MainActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_password: {
+                abortAppOnPause = false;
                 startActivityForResult(
                         AddPasswordEntryActivity.makeIntent(MainActivity.this), REQUEST_CODE);
                 return true;
@@ -111,6 +143,7 @@ public class MainActivity
                 return true;
             }
             case R.id.action_edit: {
+                abortAppOnPause = false;
                 startActivityForResult(AddPasswordEntryActivity.makeIntent(
                         MainActivity.this,
                         adapterPasswordEntryList.getItemsChecked().get(0)), REQUEST_CODE);
@@ -126,6 +159,13 @@ public class MainActivity
     }
 
     private void initializeViews() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        tvEmptyMessage = (TextView) findViewById(R.id.tv_empty_message);
+        tvEmptyMessage.setText("Click in '+' to add");
+        tvEmptyMessage.setVisibility(View.INVISIBLE);
+
         rvPasswordEntry = (RecyclerView) findViewById(R.id.rv_password_entry);
         adapterPasswordEntryList = new PasswordEntryListAdapter(viewMode);
         adapterPasswordEntryList.setOnItemClickListener(new PasswordEntryListAdapter.OnItemClickListener() {
@@ -137,7 +177,6 @@ public class MainActivity
                 }
                 else if (viewMode == MODE_DELETE_EDIT) {
                     adapterPasswordEntryList.setItemChecked(passwordEntry);
-                    //invalidateOptionsMenu();
                     supportInvalidateOptionsMenu();
                 }
             }
@@ -146,7 +185,6 @@ public class MainActivity
             public void onClick(PasswordEntry passwordEntry) {
                 if (viewMode == MODE_DELETE_EDIT) {
                     adapterPasswordEntryList.setItemChecked(passwordEntry);
-                    //invalidateOptionsMenu();
                     supportInvalidateOptionsMenu();
                 }
             }
@@ -226,16 +264,40 @@ public class MainActivity
             }
         });
         adapterPasswordEntryList.setAll(passwordEntryList);
+        tvEmptyMessage.setVisibility(adapterPasswordEntryList.getItemCount() == 0?
+                View.VISIBLE
+                : View.INVISIBLE);
     }
 
     @Override
     public void removePasswordEntryListFromListAdapter(List<PasswordEntry> passwordEntryList) {
         adapterPasswordEntryList.removeItems(passwordEntryList);
+        tvEmptyMessage.setVisibility(adapterPasswordEntryList.getItemCount() == 0?
+                View.VISIBLE
+                : View.INVISIBLE);
     }
 
     @Override
     public void removePasswordEntryFromListAdapter(PasswordEntry passwordEntry) {
         adapterPasswordEntryList.removeItem(passwordEntry);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        abortAppOnPause = true;
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            PasswordEntry passwordEntry
+                    = intent.getParcelableExtra(AddPasswordEntryActivity.PASSWORD_ENTRY);
+            adapterPasswordEntryList.addItem(passwordEntry);
+        }
+        if (intent != null && intent.getBooleanExtra(ABORT_APP, false)) {
+            startActivity(LoginActivity.makeIntent(MainActivity.this));
+            finish();
+        }
+        tvEmptyMessage.setVisibility(adapterPasswordEntryList.getItemCount() == 0?
+                View.VISIBLE
+                : View.INVISIBLE);
     }
 
     @Override

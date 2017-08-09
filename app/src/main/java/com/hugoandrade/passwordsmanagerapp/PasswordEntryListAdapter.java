@@ -1,6 +1,7 @@
 package com.hugoandrade.passwordsmanagerapp;
 
 import android.graphics.Color;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.method.HideReturnsTransformationMethod;
@@ -66,6 +67,9 @@ public class PasswordEntryListAdapter
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final MPasswordEntry passwordEntry = passwordEntryList.get(position);
+        holder.tvAccountName.setVisibility(
+                passwordEntry.accountName == null? View.GONE : View.VISIBLE);
+        holder.tvEntryName.setText(passwordEntry.entryName);
         holder.tvAccountName.setText(passwordEntry.accountName);
         holder.etPassword.setText(!passwordEntry.isVisible?
                 HIDDEN_DEFAULT_TEXT:
@@ -108,8 +112,7 @@ public class PasswordEntryListAdapter
                     (int) Options.fromDpToPixel(holder.vgPasswordEntry.getContext(), 60), 0, 0, 0);
 
         }
-        else
-        {
+        else {
             holder.vgCheckBox.setVisibility(View.INVISIBLE);
             holder.vgPasswordEntry.setPadding(0, 0, 0, 0);
         }
@@ -140,6 +143,12 @@ public class PasswordEntryListAdapter
     public void removeItems(List<PasswordEntry> passwordEntryList) {
         for (PasswordEntry e : passwordEntryList)
             removeItem(e);
+    }
+
+    public void addItem(PasswordEntry passwordEntry) {
+        passwordEntryList.add(new MPasswordEntry(passwordEntry, false, false));
+        notifyItemInserted(passwordEntryList.size() - 1);
+
     }
 
     public void setItemChecked(PasswordEntry passwordEntry) {
@@ -276,7 +285,7 @@ public class PasswordEntryListAdapter
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
-        TextView tvAccountName, etPassword;
+        TextView tvEntryName, tvAccountName, etPassword;
         ImageView ivPasswordVisibility;
         CheckBox checkBoxSelected;
         View llContainer;
@@ -289,6 +298,7 @@ public class PasswordEntryListAdapter
             this.vgCheckBox = view.findViewById(R.id.vg_checkBox);
             this.vgPasswordEntry = view.findViewById(R.id.vg_password_entry);
 
+            this.tvEntryName = (TextView) view.findViewById(R.id.tv_entry_name);
             this.tvAccountName = (TextView) view.findViewById(R.id.tv_account_name);
             this.etPassword = (TextView) view.findViewById(R.id.tv_password);
             this.ivPasswordVisibility = (ImageView) view.findViewById(R.id.iv_password_visibility);
@@ -305,6 +315,7 @@ public class PasswordEntryListAdapter
             llContainer.setBackgroundColor(Color.TRANSPARENT);
         }
     }
+
     private class MyAnimator extends Animation {
 
         // The views to be animated
@@ -344,11 +355,14 @@ public class PasswordEntryListAdapter
             viewGroupPasswordEntry.requestLayout();
         }
     }
+
     private class MPasswordEntry extends PasswordEntry {
         public boolean isVisible, isSelected;
 
         public MPasswordEntry(PasswordEntry passwordEntry, boolean isVisible, boolean isSelected) {
-            super(passwordEntry.id, passwordEntry.accountName, passwordEntry.password, passwordEntry.order);
+            super(passwordEntry.id,
+                    passwordEntry.entryName, passwordEntry.accountName,
+                    passwordEntry.password, passwordEntry.order);
             this.isVisible = isVisible;
             this.isSelected = isSelected;
         }

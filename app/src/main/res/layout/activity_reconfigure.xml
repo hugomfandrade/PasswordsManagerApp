@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    android:id="@+id/layout_activity_reconfigurate"
-    android:background="@color/colorPrimary">
+    android:id="@+id/layout_activity_reconfigure"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_instructions"
@@ -17,39 +17,36 @@
         android:textColor="@android:color/white"
         android:textSize="20sp"
         android:padding="20dp"
-        android:text="instruction"
         />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout">
 
-        <EditText
-            android:id="@+id/et_code"
-            android:padding="8dp"
-            android:background="#00ffffff"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:inputType="numberPassword"
-            android:textSize="26sp"
-            android:textColor="#fff"
-            android:enabled="false"/>
+    <LinearLayout
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingEnd="30dp"
-            android:paddingStart="30dp">
+            android:gravity="center">
 
-            <include layout="@layout/keyboard"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_pin_display"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="40dp" />
+
         </LinearLayout>
+
+
+        <com.hugoandrade.passwordsmanagerapp.KeyboardView
+            android:id="@+id/kb_keyboard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
+
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

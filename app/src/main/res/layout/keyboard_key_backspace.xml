@@ -11,25 +11,21 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:percentile_height="100"
         app:corner_radius="200dp"
         app:background_color="@android:color/transparent"
         app:background_color_selected="@android:color/transparent"
-        app:border_color="@color/colorAccent"
-        app:border_elevation="4dp">
+        app:border_color="@android:color/transparent">
 
-        <TextView
+        <ImageView
+            android:id="@+id/iv_keyboard_backspace"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="4dp"
             android:layout_weight="1"
-            android:id="@+id/tv_keyboard"
-            android:text="1"
-            android:textSize="30sp"
-            android:gravity="center"
-            android:textColor="@color/colorAccent"
+            android:padding="20dp"
+            android:src="@drawable/ic_backspace"
             android:background="?android:attr/selectableItemBackground"
-            />
+            android:tint="@color/colorAccent"/>
 
     </com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout>
+
 </LinearLayout>
