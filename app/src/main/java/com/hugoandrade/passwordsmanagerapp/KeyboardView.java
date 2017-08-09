@@ -278,7 +278,7 @@ public class KeyboardView extends LinearLayout {
                     if (position == 10)
                         ((TextView) vKey).setText("0");
                     else
-                        ((TextView) vKey).setText(String.valueOf(Integer.toString(position)));
+                        ((TextView) vKey).setText(String.valueOf(Integer.toString(position + 1)));
 
                     int min = height;
                     if (width < min)
