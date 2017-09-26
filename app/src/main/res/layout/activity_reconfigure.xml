@@ -35,7 +35,7 @@
         </LinearLayout>
 
 
-        <com.hugoandrade.passwordsmanagerapp.KeyboardView
+        <org.hugoandrade.passwordsmanagerapp.customview.KeyboardView
             android:id="@+id/kb_keyboard"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"

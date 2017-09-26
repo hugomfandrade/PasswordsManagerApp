@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center" >
 
-    <com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout
+    <org.hugoandrade.passwordsmanagerapp.customview.RoundedCornerLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -26,6 +26,6 @@
             android:background="?android:attr/selectableItemBackground"
             android:tint="@color/colorAccent"/>
 
-    </com.hugoandrade.passwordsmanagerapp.RoundedCornerLayout>
+    </org.hugoandrade.passwordsmanagerapp.customview.RoundedCornerLayout>
 
 </LinearLayout>
