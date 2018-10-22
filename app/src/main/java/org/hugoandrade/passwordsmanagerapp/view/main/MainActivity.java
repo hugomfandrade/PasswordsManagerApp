@@ -18,12 +18,11 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import org.hugoandrade.passwordsmanagerapp.MVP;
-import org.hugoandrade.passwordsmanagerapp.presenter.MainPresenter;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.presenter.MainPresenter;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
-import org.hugoandrade.passwordsmanagerapp.view.ActivityBase;
-import org.hugoandrade.passwordsmanagerapp.view.AddPasswordEntryActivity;
-import org.hugoandrade.passwordsmanagerapp.view.LoginActivity;
+import org.hugoandrade.passwordsmanagerapp.common.ActivityBase;
+import org.hugoandrade.passwordsmanagerapp.view.login.LoginActivity;
 import org.hugoandrade.passwordsmanagerapp.view.dialog.SimpleBuilderDialog;
 
 import java.util.Collections;
@@ -165,10 +164,7 @@ public class MainActivity
         tvEmptyMessage.setText("Click '+' to add");
         tvEmptyMessage.setVisibility(View.INVISIBLE);
 
-        rvPasswordEntry = findViewById(R.id.rv_password_entry);
-        rvPasswordEntry.setHasFixedSize(true);
-        rvPasswordEntry.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvPasswordEntry.setItemAnimator(new DefaultItemAnimator() {
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator() {
 
             @Override
             public void onRemoveFinished(RecyclerView.ViewHolder item) {
@@ -182,8 +178,13 @@ public class MainActivity
                     }
                 }, rvPasswordEntry.getItemAnimator().getMoveDuration());
             }
-        });
-        rvPasswordEntry.getItemAnimator().setChangeDuration(0L);
+        };
+        itemAnimator.setChangeDuration(0);
+
+        rvPasswordEntry = findViewById(R.id.rv_password_entry);
+        rvPasswordEntry.setHasFixedSize(true);
+        rvPasswordEntry.setLayoutManager(new LinearLayoutManager(this));
+        rvPasswordEntry.setItemAnimator(itemAnimator);
 
         mPasswordEntryListAdapter = new PasswordEntryListAdapter(mViewMode);
         mPasswordEntryListAdapter.setOnItemClickListener(new PasswordEntryListAdapter.OnItemClickListener() {

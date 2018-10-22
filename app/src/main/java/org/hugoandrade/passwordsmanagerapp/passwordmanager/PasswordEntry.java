@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.objects;
+package org.hugoandrade.passwordsmanagerapp.passwordmanager;
 
 import android.database.Cursor;
 import android.os.Parcel;

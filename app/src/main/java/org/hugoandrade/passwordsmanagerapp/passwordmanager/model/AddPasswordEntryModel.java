@@ -1,9 +1,9 @@
-package org.hugoandrade.passwordsmanagerapp.model;
+package org.hugoandrade.passwordsmanagerapp.passwordmanager.model;
 
 import android.util.Log;
 
 import org.hugoandrade.passwordsmanagerapp.MVP;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 
 import java.lang.ref.WeakReference;
 

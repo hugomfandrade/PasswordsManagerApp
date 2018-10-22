@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.view;
+package org.hugoandrade.passwordsmanagerapp.view.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,18 +14,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.hugoandrade.passwordsmanagerapp.common.TextWatcherAdapter;
-import org.hugoandrade.passwordsmanagerapp.presenter.AddPasswordEntryPresenter;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.presenter.AddPasswordEntryPresenter;
 import org.hugoandrade.passwordsmanagerapp.MVP;
 import org.hugoandrade.passwordsmanagerapp.utils.OptionUtils;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
-import org.hugoandrade.passwordsmanagerapp.view.main.MainActivity;
+import org.hugoandrade.passwordsmanagerapp.common.ActivityBase;
 
 public class AddPasswordEntryActivity
 
         extends ActivityBase<MVP.RequiredAddPasswordEntryViewOps,
-                             MVP.ProvidedAddPasswordEntryPresenterOps,
-                             AddPasswordEntryPresenter>
+                                     MVP.ProvidedAddPasswordEntryPresenterOps,
+                                     AddPasswordEntryPresenter>
 
     implements MVP.RequiredAddPasswordEntryViewOps {
 

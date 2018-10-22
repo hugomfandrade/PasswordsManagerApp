@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.view;
+package org.hugoandrade.passwordsmanagerapp.view.login;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,6 @@ import org.hugoandrade.passwordsmanagerapp.customview.KeyboardView;
 import org.hugoandrade.passwordsmanagerapp.utils.OptionUtils;
 import org.hugoandrade.passwordsmanagerapp.R;
 import org.hugoandrade.passwordsmanagerapp.utils.SharedPreferencesUtils;
-import org.hugoandrade.passwordsmanagerapp.view.listadapter.PINDisplayListAdapter;
 import org.hugoandrade.passwordsmanagerapp.view.main.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.view;
+package org.hugoandrade.passwordsmanagerapp.view.login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,6 @@ import org.hugoandrade.passwordsmanagerapp.customview.KeyboardView;
 import org.hugoandrade.passwordsmanagerapp.utils.OptionUtils;
 import org.hugoandrade.passwordsmanagerapp.R;
 import org.hugoandrade.passwordsmanagerapp.utils.SharedPreferencesUtils;
-import org.hugoandrade.passwordsmanagerapp.view.listadapter.PINDisplayListAdapter;
 
 public class ReconfigurePINActivity extends AppCompatActivity {
 

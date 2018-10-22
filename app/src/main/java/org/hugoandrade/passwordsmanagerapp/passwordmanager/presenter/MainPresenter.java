@@ -1,18 +1,19 @@
-package org.hugoandrade.passwordsmanagerapp.presenter;
+package org.hugoandrade.passwordsmanagerapp.passwordmanager.presenter;
 
 import android.content.Context;
 
 import org.hugoandrade.passwordsmanagerapp.MVP;
-import org.hugoandrade.passwordsmanagerapp.model.MainModel;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.common.PresenterBase;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.model.MainModel;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 
 import java.util.List;
 
 public class MainPresenter
        extends PresenterBase<MVP.RequiredMainViewOps,
-                                       MVP.RequiredMainPresenterOps,
-                                       MVP.ProvidedMainModelOps,
-               MainModel>
+                             MVP.RequiredMainPresenterOps,
+                             MVP.ProvidedMainModelOps,
+                             MainModel>
        implements MVP.ProvidedMainPresenterOps,
                   MVP.RequiredMainPresenterOps{
 

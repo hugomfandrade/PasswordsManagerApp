@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.model;
+package org.hugoandrade.passwordsmanagerapp.passwordmanager.model;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 
 import java.util.ArrayList;
 import java.util.List;

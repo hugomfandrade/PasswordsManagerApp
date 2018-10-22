@@ -1,16 +1,17 @@
-package org.hugoandrade.passwordsmanagerapp.presenter;
+package org.hugoandrade.passwordsmanagerapp.passwordmanager.presenter;
 
 import android.content.Context;
 
-import org.hugoandrade.passwordsmanagerapp.model.AddPasswordEntryModel;
+import org.hugoandrade.passwordsmanagerapp.common.PresenterBase;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.model.AddPasswordEntryModel;
 import org.hugoandrade.passwordsmanagerapp.MVP;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 
 public class AddPasswordEntryPresenter
        extends PresenterBase<MVP.RequiredAddPasswordEntryViewOps,
-                                       MVP.RequiredAddPasswordEntryPresenterOps,
-                                       MVP.ProvidedAddPasswordEntryModelOps,
-               AddPasswordEntryModel>
+                             MVP.RequiredAddPasswordEntryPresenterOps,
+                             MVP.ProvidedAddPasswordEntryModelOps,
+                             AddPasswordEntryModel>
        implements MVP.ProvidedAddPasswordEntryPresenterOps,
                   MVP.RequiredAddPasswordEntryPresenterOps{
 

@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.presenter;
+package org.hugoandrade.passwordsmanagerapp.common;
 
 import android.util.Log;
 
@@ -6,7 +6,7 @@ import org.hugoandrade.passwordsmanagerapp.common.ModelOps;
 
 import java.lang.ref.WeakReference;
 
-public class PresenterBase<ProvidedViewOps,
+public abstract class PresenterBase<ProvidedViewOps,
                               RequiredPresenterOps,
                               ProviderModelOps,
                               ModelType extends ModelOps<RequiredPresenterOps>> {

@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.hugoandrade.passwordsmanagerapp.common.ItemTouchHelperAdapter;
 import org.hugoandrade.passwordsmanagerapp.common.ItemTouchHelperViewHolder;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
 import org.hugoandrade.passwordsmanagerapp.customview.RoundedCornerLayout;
 import org.hugoandrade.passwordsmanagerapp.common.SimpleItemTouchHelperCallback;

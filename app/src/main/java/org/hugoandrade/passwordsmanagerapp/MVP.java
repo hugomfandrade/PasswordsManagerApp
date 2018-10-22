@@ -3,7 +3,7 @@ package org.hugoandrade.passwordsmanagerapp;
 import org.hugoandrade.passwordsmanagerapp.common.ContextView;
 import org.hugoandrade.passwordsmanagerapp.common.ModelOps;
 import org.hugoandrade.passwordsmanagerapp.common.PresenterOps;
-import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
+import org.hugoandrade.passwordsmanagerapp.passwordmanager.PasswordEntry;
 
 import java.util.List;
 
