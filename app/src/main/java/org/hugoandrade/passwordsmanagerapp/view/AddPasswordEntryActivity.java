@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -14,30 +13,39 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.hugoandrade.passwordsmanagerapp.common.TextWatcherAdapter;
 import org.hugoandrade.passwordsmanagerapp.presenter.AddPasswordEntryPresenter;
 import org.hugoandrade.passwordsmanagerapp.MVP;
 import org.hugoandrade.passwordsmanagerapp.utils.OptionUtils;
 import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
+import org.hugoandrade.passwordsmanagerapp.view.main.MainActivity;
 
 public class AddPasswordEntryActivity
+
         extends ActivityBase<MVP.RequiredAddPasswordEntryViewOps,
-                                        MVP.ProvidedAddPasswordEntryPresenterOps,
-                AddPasswordEntryPresenter>
+                             MVP.ProvidedAddPasswordEntryPresenterOps,
+                             AddPasswordEntryPresenter>
+
     implements MVP.RequiredAddPasswordEntryViewOps {
 
-    public static final String PASSWORD_ENTRY = "PasswordEntry";
-    private static final int MODE_ADD = 0;
-    private static final int MODE_EDIT = 1;
+    public static final String INTENT_EXTRA_PASSWORD_ENTRY = "intent_extra_password_entry";
 
-    private EditText etEntryName, etAccountName, etPassword;
+    private enum Mode {
+        Add,
+        Edit
+    }
+
+    private Mode mode;
+
+    private EditText etEntryName;
+    private EditText etAccountName;
+    private EditText etPassword;
     private TextView tvAddPasswordEntry;
 
     private PasswordEntry passwordEntry;
 
     private boolean isAccountNameFieldVisible = false;
-    private int mode;
-
     private boolean abortAppOnPause = true;
 
     public static Intent makeIntent(Context context) {
@@ -45,9 +53,7 @@ public class AddPasswordEntryActivity
     }
 
     public static Intent makeIntent(Context context, PasswordEntry passwordEntry) {
-        Intent intent = new Intent(context, AddPasswordEntryActivity.class);
-        intent.putExtra(PASSWORD_ENTRY, passwordEntry);
-        return intent;
+        return makeIntent(context).putExtra(INTENT_EXTRA_PASSWORD_ENTRY, passwordEntry);
     }
 
     @Override
@@ -62,10 +68,6 @@ public class AddPasswordEntryActivity
 
         enableInputFields(true);
 
-        assert getSupportActionBar() != null;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         super.onCreate(AddPasswordEntryPresenter.class, this);
     }
 
@@ -73,13 +75,8 @@ public class AddPasswordEntryActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_add_password_entry, menu);
 
-        if (isAccountNameFieldVisible) {
-            menu.findItem(R.id.action_add_field).setVisible(false);
-            menu.findItem(R.id.action_remove_field).setVisible(true);
-        } else {
-            menu.findItem(R.id.action_add_field).setVisible(true);
-            menu.findItem(R.id.action_remove_field).setVisible(false);
-        }
+        menu.findItem(R.id.action_add_field).setVisible(!isAccountNameFieldVisible);
+        menu.findItem(R.id.action_remove_field).setVisible(isAccountNameFieldVisible);
 
         return true;
     }
@@ -128,6 +125,11 @@ public class AddPasswordEntryActivity
     private void initializeUI() {
         setContentView(R.layout.activity_add_password_entry);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
         etEntryName   = (EditText) findViewById(R.id.et_entry_name);
         etAccountName = (EditText) findViewById(R.id.et_account_name);
         etPassword    = (EditText) findViewById(R.id.et_password);
@@ -149,31 +151,30 @@ public class AddPasswordEntryActivity
         tvAddPasswordEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mode == MODE_ADD) {
+                String accountName = etAccountName.getText().toString();
+                String entryName = etEntryName.getText().toString();
+                String password = etPassword.getText().toString();
+                if (mode == Mode.Add) {
                     getPresenter().addPasswordEntry(
-                            etEntryName.getText().toString(),
-                            isAccountNameFieldVisible?
-                                    etAccountName.getText().toString()
-                                    : null,
-                            etPassword.getText().toString());
+                            entryName,
+                            isAccountNameFieldVisible ? accountName : null,
+                            password);
                 }
-                else if (mode == MODE_EDIT) {
+                else if (mode == Mode.Edit) {
                     getPresenter().editPasswordEntry(
                             passwordEntry,
-                            etEntryName.getText().toString(),
-                            isAccountNameFieldVisible?
-                                    etAccountName.getText().toString()
-                                    : null,
-                            etPassword.getText().toString());
+                            entryName,
+                            isAccountNameFieldVisible? accountName : null,
+                            password);
                 }
             }
         });
     }
 
     private void readIntent() {
-        if (getIntent() != null && getIntent().getParcelableExtra(PASSWORD_ENTRY) != null) {
-            mode = MODE_EDIT;
-            passwordEntry = getIntent().getParcelableExtra(PASSWORD_ENTRY);
+        if (getIntent() != null && getIntent().getParcelableExtra(INTENT_EXTRA_PASSWORD_ENTRY) != null) {
+            mode = Mode.Edit;
+            passwordEntry = getIntent().getParcelableExtra(INTENT_EXTRA_PASSWORD_ENTRY);
 
             addRemoveAccountNameField(passwordEntry.accountName != null);
 
@@ -184,7 +185,7 @@ public class AddPasswordEntryActivity
             tvAddPasswordEntry.setText("Save");
         }
         else {
-            mode = MODE_ADD;
+            mode = Mode.Add;
 
             addRemoveAccountNameField(false);
         }
@@ -211,9 +212,7 @@ public class AddPasswordEntryActivity
     public void successfulAddPasswordEntry(PasswordEntry passwordEntry) {
         abortAppOnPause = false;
 
-        Intent intent = new Intent();
-        intent.putExtra(PASSWORD_ENTRY, passwordEntry);
-        setResult(RESULT_OK, intent);
+        setResult(RESULT_OK, new Intent().putExtra(INTENT_EXTRA_PASSWORD_ENTRY, passwordEntry));
         finish();
     }
 
@@ -230,9 +229,8 @@ public class AddPasswordEntryActivity
     }
 
 
-    private TextWatcher mTextWatcher = new TextWatcher() {
-        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-        @Override public void afterTextChanged(Editable s) { }
+    private TextWatcher mTextWatcher = new TextWatcherAdapter() {
+
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             checkInputFields();

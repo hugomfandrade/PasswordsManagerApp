@@ -1,4 +1,4 @@
-package org.hugoandrade.passwordsmanagerapp.view;
+package org.hugoandrade.passwordsmanagerapp.view.main;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,8 +21,10 @@ import org.hugoandrade.passwordsmanagerapp.MVP;
 import org.hugoandrade.passwordsmanagerapp.presenter.MainPresenter;
 import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
+import org.hugoandrade.passwordsmanagerapp.view.ActivityBase;
+import org.hugoandrade.passwordsmanagerapp.view.AddPasswordEntryActivity;
+import org.hugoandrade.passwordsmanagerapp.view.LoginActivity;
 import org.hugoandrade.passwordsmanagerapp.view.dialog.SimpleBuilderDialog;
-import org.hugoandrade.passwordsmanagerapp.view.listadapter.PasswordEntryListAdapter;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,17 +36,11 @@ public class MainActivity
 
     private static final int REQUEST_CODE = 1;
 
-    public static final int MODE_NONE = -1;
-    public static final int MODE_DEFAULT = 1;
-    public static final int MODE_DELETE_EDIT = 2;
-    public static final int MODE_REORDER = 3;
-
     public static final String ABORT_APP = "AbortApp";
 
-    private int viewMode = 0;
+    private ViewMode mViewMode = ViewMode.NONE;
 
     private TextView tvEmptyMessage;
-
     private RecyclerView rvPasswordEntry;
     private PasswordEntryListAdapter mPasswordEntryListAdapter;
 
@@ -71,24 +67,26 @@ public class MainActivity
     protected void onResume() {
         super.onResume();
 
-        updateMode(MODE_DEFAULT);
+        updateMode(ViewMode.DEFAULT);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        switch (viewMode) {
-            case MODE_DEFAULT:
-            case MODE_REORDER:
+        switch (mViewMode) {
+            case DEFAULT:
+            case REORDER:
                 getMenuInflater().inflate(R.menu.menu_main, menu);
                 Drawable drawable = menu.findItem(R.id.action_add_password).getIcon();
                 if (drawable != null) {
                     drawable.mutate();
                     drawable.setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
                 }
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setDisplayShowTitleEnabled(true);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    getSupportActionBar().setDisplayShowTitleEnabled(true);
+                }
                 break;
-            case MODE_DELETE_EDIT:
+            case DELETE_EDIT:
                 getMenuInflater().inflate(R.menu.menu_main_delete_mode, menu);
 
                 menu.findItem(R.id.action_delete).setVisible(
@@ -96,8 +94,10 @@ public class MainActivity
                 menu.findItem(R.id.action_edit).setVisible(
                         mPasswordEntryListAdapter.getSelectedItems().size() == 1);
 
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    getSupportActionBar().setDisplayShowTitleEnabled(false);
+                }
         }
         return true;
     }
@@ -123,8 +123,9 @@ public class MainActivity
                             getPresenter().deletePasswordEntryList(
                                     mPasswordEntryListAdapter.getSelectedItems());
                         }
-                        else
+                        else {
                             dialog.dismiss();
+                        }
                     }
                 });
                 return true;
@@ -137,7 +138,7 @@ public class MainActivity
                 return true;
             }
             case android.R.id.home: {
-                updateMode(MODE_DEFAULT);
+                updateMode(ViewMode.DEFAULT);
                 return true;
             }
         }
@@ -157,17 +158,16 @@ public class MainActivity
     private void initializeUI() {
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        tvEmptyMessage = (TextView) findViewById(R.id.tv_empty_message);
+        tvEmptyMessage = findViewById(R.id.tv_empty_message);
         tvEmptyMessage.setText("Click '+' to add");
         tvEmptyMessage.setVisibility(View.INVISIBLE);
 
-        rvPasswordEntry = (RecyclerView) findViewById(R.id.rv_password_entry);
+        rvPasswordEntry = findViewById(R.id.rv_password_entry);
         rvPasswordEntry.setHasFixedSize(true);
         rvPasswordEntry.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvPasswordEntry.getItemAnimator().setChangeDuration(0L);
         rvPasswordEntry.setItemAnimator(new DefaultItemAnimator() {
 
             @Override
@@ -178,28 +178,29 @@ public class MainActivity
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        updateMode(MODE_DEFAULT);
+                        updateMode(ViewMode.DEFAULT);
                     }
                 }, rvPasswordEntry.getItemAnimator().getMoveDuration());
             }
         });
+        rvPasswordEntry.getItemAnimator().setChangeDuration(0L);
 
-        mPasswordEntryListAdapter = new PasswordEntryListAdapter(viewMode);
+        mPasswordEntryListAdapter = new PasswordEntryListAdapter(mViewMode);
         mPasswordEntryListAdapter.setOnItemClickListener(new PasswordEntryListAdapter.OnItemClickListener() {
             @Override
             public void onLongClick(PasswordEntry passwordEntry) {
-                if (viewMode == MODE_DEFAULT) {
+                if (mViewMode == ViewMode.DEFAULT) {
                     mPasswordEntryListAdapter.changeItemSelectionStatus(passwordEntry);
-                    updateMode(MODE_DELETE_EDIT);
+                    updateMode(ViewMode.DELETE_EDIT);
                 }
-                else if (viewMode == MODE_DELETE_EDIT) {
+                else if (mViewMode == ViewMode.DELETE_EDIT) {
                     changeItemSelectionStatus(passwordEntry);
                 }
             }
 
             @Override
             public void onClick(PasswordEntry passwordEntry) {
-                if (viewMode == MODE_DELETE_EDIT) {
+                if (mViewMode == ViewMode.DELETE_EDIT) {
                     changeItemSelectionStatus(passwordEntry);
                 }
             }
@@ -207,14 +208,15 @@ public class MainActivity
         mPasswordEntryListAdapter.setOnItemMoveListener(new PasswordEntryListAdapter.OnItemMoveListener() {
             @Override
             public void onItemMove(List<PasswordEntry> passwordEntryAffectedList) {
-                updateMode(MODE_REORDER);
-                for (PasswordEntry e : passwordEntryAffectedList)
+                updateMode(ViewMode.REORDER);
+                for (PasswordEntry e : passwordEntryAffectedList) {
                     getPresenter().updatePasswordEntryItem(e);
+                }
             }
             @Override
             public void onItemDropped() {
-                if (viewMode == MODE_REORDER) {
-                    updateMode(MODE_DEFAULT);
+                if (mViewMode == ViewMode.REORDER) {
+                    updateMode(ViewMode.DEFAULT);
                 }
             }
         });
@@ -225,20 +227,23 @@ public class MainActivity
         mPasswordEntryListAdapter.changeItemSelectionStatus(passwordEntry);
         supportInvalidateOptionsMenu();
 
-        if (mPasswordEntryListAdapter.getSelectedItems().size() == 0)
-            updateMode(MODE_DEFAULT);
+        if (mPasswordEntryListAdapter.getSelectedItems().size() == 0) {
+            updateMode(ViewMode.DEFAULT);
+        }
     }
 
-    private void updateMode(int mode) {
-        if (viewMode == mode)
+    private void updateMode(ViewMode mode) {
+        if (mViewMode == mode) {
             return;
+        }
 
-        viewMode = mode;
-        mPasswordEntryListAdapter.updateViewMode(viewMode);
+        mViewMode = mode;
+        mPasswordEntryListAdapter.updateViewMode(mViewMode);
         supportInvalidateOptionsMenu();
 
-        if (viewMode == MODE_DEFAULT)
+        if (mViewMode == ViewMode.DEFAULT) {
             mPasswordEntryListAdapter.resetAll();
+        }
     }
 
     @Override
@@ -277,7 +282,7 @@ public class MainActivity
 
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             PasswordEntry passwordEntry
-                    = intent.getParcelableExtra(AddPasswordEntryActivity.PASSWORD_ENTRY);
+                    = intent.getParcelableExtra(AddPasswordEntryActivity.INTENT_EXTRA_PASSWORD_ENTRY);
             mPasswordEntryListAdapter.addItem(passwordEntry);
         }
         if (intent != null && intent.getBooleanExtra(ABORT_APP, false)) {
@@ -290,9 +295,11 @@ public class MainActivity
 
     @Override
     public void onBackPressed() {
-        if (viewMode == MODE_DELETE_EDIT)
-            updateMode(MODE_DEFAULT);
-        else
+        if (mViewMode == ViewMode.DELETE_EDIT) {
+            updateMode(ViewMode.DEFAULT);
+        }
+        else {
             super.onBackPressed();
+        }
     }
 }

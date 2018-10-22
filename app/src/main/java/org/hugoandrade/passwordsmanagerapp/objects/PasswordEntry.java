@@ -13,13 +13,16 @@ public class PasswordEntry implements Parcelable {
     public int order;
 
     public static class Entry {
+
         public static final String TABLE_NAME = "PasswordEntry";
 
-        public final static String COL__ID = "_id";
-        public final static String COL_ENTRY_NAME = "EntryName";
-        public final static String COL_ACCOUNT_NAME = "AccountName";
-        public final static String COL_PASSWORD = "Password";
-        public final static String COL_ORDER = "OrderNumber";
+        public static class Cols {
+            public final static String _ID = "_id";
+            public final static String ENTRY_NAME = "EntryName";
+            public final static String ACCOUNT_NAME = "AccountName";
+            public final static String PASSWORD = "Password";
+            public final static String ORDER = "OrderNumber";
+        }
     }
 
     public PasswordEntry(String id, String entryName, String accountName, String password, int order) {
@@ -28,6 +31,15 @@ public class PasswordEntry implements Parcelable {
         this.accountName = accountName;
         this.password = password;
         this.order = order;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PasswordEntry) {
+            PasswordEntry passwordEntry = (PasswordEntry) obj;
+            return passwordEntry.id.equals(id);
+        }
+        return super.equals(obj);
     }
 
     protected PasswordEntry(Parcel in) {
@@ -71,11 +83,11 @@ public class PasswordEntry implements Parcelable {
 
     public static PasswordEntry parseFromCursor(Cursor cursor) {
         return new PasswordEntry(
-                cursor.getString(cursor.getColumnIndex(Entry.COL__ID)),
-                cursor.getString(cursor.getColumnIndex(Entry.COL_ENTRY_NAME)),
-                cursor.getString(cursor.getColumnIndex(Entry.COL_ACCOUNT_NAME)),
-                cursor.getString(cursor.getColumnIndex(Entry.COL_PASSWORD)),
-                cursor.getInt(cursor.getColumnIndex(Entry.COL_ORDER)));
+                cursor.getString(cursor.getColumnIndex(Entry.Cols._ID)),
+                cursor.getString(cursor.getColumnIndex(Entry.Cols.ENTRY_NAME)),
+                cursor.getString(cursor.getColumnIndex(Entry.Cols.ACCOUNT_NAME)),
+                cursor.getString(cursor.getColumnIndex(Entry.Cols.PASSWORD)),
+                cursor.getInt(cursor.getColumnIndex(Entry.Cols.ORDER)));
     }
 
 }

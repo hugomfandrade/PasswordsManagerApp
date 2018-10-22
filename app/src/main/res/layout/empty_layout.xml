@@ -4,6 +4,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.hugoandrade.passwordsmanagerapp.view.MainActivity"
+    tools:context="org.hugoandrade.passwordsmanagerapp.view.main.MainActivity"
     android:background="@color/colorPrimary">
 </RelativeLayout>

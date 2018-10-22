@@ -77,16 +77,16 @@ public abstract class DatabaseModel {
 
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
-                values.put(PasswordEntry.Entry.COL_ENTRY_NAME, entryName);
-                values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, accountName);
-                values.put(PasswordEntry.Entry.COL_PASSWORD, password);
-                values.put(PasswordEntry.Entry.COL_ORDER, nItems);
+                values.put(PasswordEntry.Entry.Cols.ENTRY_NAME, entryName);
+                values.put(PasswordEntry.Entry.Cols.ACCOUNT_NAME, accountName);
+                values.put(PasswordEntry.Entry.Cols.PASSWORD, password);
+                values.put(PasswordEntry.Entry.Cols.ORDER, nItems);
 
                 // Insert the new row, returning the primary key value of the new row
                 long newRowId = database.insert(PasswordEntry.Entry.TABLE_NAME, null, values);
 
                 Cursor cursor = database.query(PasswordEntry.Entry.TABLE_NAME, null,
-                        PasswordEntry.Entry.COL__ID + " = ?", new String[] {String.valueOf(newRowId)},
+                        PasswordEntry.Entry.Cols._ID + " = ?", new String[] {String.valueOf(newRowId)},
                         null, null, null);
 
                 cursor.moveToFirst();
@@ -120,7 +120,7 @@ public abstract class DatabaseModel {
                 for (PasswordEntry passwordEntry : passwordEntryList) {
                     int nRowsAffected = database.delete(
                             PasswordEntry.Entry.TABLE_NAME,
-                            PasswordEntry.Entry.COL__ID + " = ?",
+                            PasswordEntry.Entry.Cols._ID + " = ?",
                             new String[]{String.valueOf(passwordEntry.id)});
 
                     if (nRowsAffected != 0)
@@ -166,15 +166,15 @@ public abstract class DatabaseModel {
             protected PasswordEntry doInBackground(Void... params) {
                 // Create a new map of values, where column names are the keys
                 ContentValues values = new ContentValues();
-                values.put(PasswordEntry.Entry.COL__ID, passwordEntry.id);
-                values.put(PasswordEntry.Entry.COL_ENTRY_NAME, passwordEntry.entryName);
-                values.put(PasswordEntry.Entry.COL_ACCOUNT_NAME, passwordEntry.accountName);
-                values.put(PasswordEntry.Entry.COL_PASSWORD, passwordEntry.password);
-                values.put(PasswordEntry.Entry.COL_ORDER, passwordEntry.order);
+                values.put(PasswordEntry.Entry.Cols._ID, passwordEntry.id);
+                values.put(PasswordEntry.Entry.Cols.ENTRY_NAME, passwordEntry.entryName);
+                values.put(PasswordEntry.Entry.Cols.ACCOUNT_NAME, passwordEntry.accountName);
+                values.put(PasswordEntry.Entry.Cols.PASSWORD, passwordEntry.password);
+                values.put(PasswordEntry.Entry.Cols.ORDER, passwordEntry.order);
 
                 int nRowsAffected = database.update(
                         PasswordEntry.Entry.TABLE_NAME, values,
-                        PasswordEntry.Entry.COL__ID + " = ?",
+                        PasswordEntry.Entry.Cols._ID + " = ?",
                         new String[]{String.valueOf(passwordEntry.id)});
 
                 if (nRowsAffected == 0)
@@ -199,7 +199,7 @@ public abstract class DatabaseModel {
             protected PasswordEntry doInBackground(Void... params) {
                 int nRowsAffected = database.delete(
                         PasswordEntry.Entry.TABLE_NAME,
-                        PasswordEntry.Entry.COL__ID + " = ?",
+                        PasswordEntry.Entry.Cols._ID + " = ?",
                         new String[]{String.valueOf(passwordEntry.id)});
 
                 if (nRowsAffected == 0)
@@ -253,11 +253,11 @@ public abstract class DatabaseModel {
 
         private static final String CREATE_DB_TABLE_PASSWORD_ENTRY =
                 " CREATE TABLE " + PasswordEntry.Entry.TABLE_NAME + " (" +
-                        " " + PasswordEntry.Entry.COL__ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        " " + PasswordEntry.Entry.COL_ENTRY_NAME + " TEXT UNIQUE NOT NULL, " +
-                        " " + PasswordEntry.Entry.COL_ACCOUNT_NAME + " TEXT NULL, " +
-                        " " + PasswordEntry.Entry.COL_PASSWORD + " TEXT NOT NULL, " +
-                        " " + PasswordEntry.Entry.COL_ORDER + " INTEGER NOT NULL " +
+                        " " + PasswordEntry.Entry.Cols._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        " " + PasswordEntry.Entry.Cols.ENTRY_NAME + " TEXT UNIQUE NOT NULL, " +
+                        " " + PasswordEntry.Entry.Cols.ACCOUNT_NAME + " TEXT NULL, " +
+                        " " + PasswordEntry.Entry.Cols.PASSWORD + " TEXT NOT NULL, " +
+                        " " + PasswordEntry.Entry.Cols.ORDER + " INTEGER NOT NULL " +
                         " );";
 
         @SuppressWarnings("unused")

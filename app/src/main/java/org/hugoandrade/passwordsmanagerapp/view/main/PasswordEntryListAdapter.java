@@ -1,5 +1,6 @@
-package org.hugoandrade.passwordsmanagerapp.view.listadapter;
+package org.hugoandrade.passwordsmanagerapp.view.main;
 
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -21,97 +22,75 @@ import org.hugoandrade.passwordsmanagerapp.objects.PasswordEntry;
 import org.hugoandrade.passwordsmanagerapp.R;
 import org.hugoandrade.passwordsmanagerapp.customview.RoundedCornerLayout;
 import org.hugoandrade.passwordsmanagerapp.common.SimpleItemTouchHelperCallback;
-import org.hugoandrade.passwordsmanagerapp.view.MainActivity;
 
+@SuppressWarnings("WeakerAccess")
 public class PasswordEntryListAdapter
+
         extends RecyclerView.Adapter<PasswordEntryListAdapter.ViewHolder>
+
         implements ItemTouchHelperAdapter {
 
     @SuppressWarnings("unused")
     private final static String TAG = PasswordEntryListAdapter.class.getSimpleName();
 
-    private static final String HIDDEN_DEFAULT_TEXT = "Password";
+    private static final String HIDDEN_DEFAULT_TEXT = "password";
 
-    private final List<MPasswordEntry> passwordEntryList;
-    private int viewMode = MainActivity.MODE_NONE;
+    private final List<MPasswordEntry> mPasswordEntries;
+
+    private ViewMode mViewMode = ViewMode.NONE;
 
     private OnItemClickListener mOnItemClickListener;
     private OnItemMoveListener mOnItemMoveListener;
     private ItemTouchHelper mItemTouchHelper;
-    //private RecyclerView recyclerView;
 
-    public PasswordEntryListAdapter(int viewMode) {
+    public PasswordEntryListAdapter(ViewMode viewMode) {
         this(viewMode, new ArrayList<PasswordEntry>());
     }
 
-    public PasswordEntryListAdapter(int viewMode, List<PasswordEntry> passwordEntryList) {
-        this.viewMode = viewMode;
-        this.passwordEntryList = new ArrayList<>();
-        for (PasswordEntry e : passwordEntryList)
-            this.passwordEntryList.add(new MPasswordEntry(e, false, false));
+    public PasswordEntryListAdapter(ViewMode viewMode, List<PasswordEntry> mPasswordEntries) {
+        this.mViewMode = viewMode;
+        this.mPasswordEntries = new ArrayList<>();
+        for (PasswordEntry e : mPasswordEntries) {
+            this.mPasswordEntries.add(new MPasswordEntry(e, false, false));
+        }
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        //this.recyclerView = recyclerView;
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(this);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(//this.
-                recyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater vi = LayoutInflater.from(parent.getContext());
         return new ViewHolder(vi.inflate(R.layout.list_item_password_entry, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        final MPasswordEntry passwordEntry = passwordEntryList.get(position);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        MPasswordEntry e = mPasswordEntries.get(holder.getAdapterPosition());
+        PasswordEntry passwordEntry = e.passwordEntry;
+        boolean isVisible = e.isVisible;
+        boolean isSelected = e.isSelected;
 
         holder.tvEntryName.setText(passwordEntry.entryName);
         holder.tvAccountName.setText(passwordEntry.accountName);
-        holder.etPassword.setText(!passwordEntry.isVisible?
-                HIDDEN_DEFAULT_TEXT:
-                passwordEntry.password);
         holder.tvAccountName.setVisibility(
                 passwordEntry.accountName == null? View.GONE : View.VISIBLE);
-        holder.etPassword.setTransformationMethod(!passwordEntry.isVisible?
+        holder.etPassword.setText(!isVisible? HIDDEN_DEFAULT_TEXT: passwordEntry.password);
+        holder.etPassword.setTransformationMethod(!isVisible?
                 PasswordTransformationMethod.getInstance() :
                 HideReturnsTransformationMethod.getInstance());
-        holder.ivPasswordVisibility.setImageResource(!passwordEntry.isVisible?
+        holder.ivPasswordVisibility.setImageResource(!isVisible?
                 R.drawable.ic_password_visibility :
                 R.drawable.ic_password_visibility_off);
-        holder.ivPasswordVisibility.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                passwordEntry.isVisible = !passwordEntry.isVisible;
-                notifyItemChanged(holder.getAdapterPosition());
-            }
-        });
-        holder.vContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnItemClickListener != null)
-                    mOnItemClickListener.onClick(passwordEntry);
-            }
-        });
-        holder.vContainer.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (mItemTouchHelper != null && viewMode == MainActivity.MODE_DEFAULT) {
-                    mItemTouchHelper.startDrag(holder);
-                }
-                if (mOnItemClickListener != null)
-                    mOnItemClickListener.onLongClick(passwordEntry);
-                return false;
-            }
-        });
 
         int color = ContextCompat.getColor(holder.rclContainer.getContext(),
-                passwordEntry.isSelected ?
+                isSelected ?
                         R.color.colorPrimaryDark:
                         R.color.colorPrimary);
 
@@ -120,28 +99,30 @@ public class PasswordEntryListAdapter
 
     @Override
     public int getItemCount() {
-        return passwordEntryList.size();
+        return mPasswordEntries.size();
     }
 
     public void setAll(List<PasswordEntry> passwordEntryList) {
-        this.passwordEntryList.clear();
-        for (PasswordEntry e : passwordEntryList)
-            this.passwordEntryList.add(new MPasswordEntry(e, false, false));
+        this.mPasswordEntries.clear();
+        for (PasswordEntry e : passwordEntryList) {
+            this.mPasswordEntries.add(new MPasswordEntry(e, false, false));
+        }
 
         notifyDataSetChanged();
     }
 
     public void resetAll() {
-        for (MPasswordEntry e : passwordEntryList)
+        for (MPasswordEntry e : mPasswordEntries) {
             e.isSelected = false;
+        }
 
         notifyDataSetChanged();
     }
 
     public void removeItem(PasswordEntry passwordEntry) {
-        for (int i = 0 ; i < passwordEntryList.size() ; i++)
-            if (passwordEntryList.get(i) == passwordEntry) {
-                passwordEntryList.remove(i);
+        for (int i = 0; i < mPasswordEntries.size() ; i++)
+            if (mPasswordEntries.get(i).passwordEntry.equals(passwordEntry)) {
+                mPasswordEntries.remove(i);
                 notifyItemRemoved(i);
                 notifyItemRangeChanged(i, getItemCount());
                 break;
@@ -149,23 +130,25 @@ public class PasswordEntryListAdapter
     }
 
     public void removeItems(List<PasswordEntry> passwordEntryList) {
-        for (PasswordEntry e : passwordEntryList)
+        for (PasswordEntry e : passwordEntryList) {
             removeItem(e);
+        }
     }
 
     public void addItem(PasswordEntry passwordEntry) {
-        passwordEntryList.add(new MPasswordEntry(passwordEntry, false, false));
-        notifyItemInserted(passwordEntryList.size() - 1);
+        mPasswordEntries.add(new MPasswordEntry(passwordEntry, false, false));
+        notifyItemInserted(mPasswordEntries.size() - 1);
 
     }
 
     public void changeItemSelectionStatus(PasswordEntry passwordEntry) {
-        for (int i = 0 ; i < passwordEntryList.size() ; i++)
-            if (passwordEntryList.get(i) == passwordEntry) {
-                passwordEntryList.get(i).isSelected = !passwordEntryList.get(i).isSelected;
+        for (int i = 0; i < mPasswordEntries.size() ; i++)
+            if (mPasswordEntries.get(i).passwordEntry.equals(passwordEntry)) {
+                mPasswordEntries.get(i).isSelected = !mPasswordEntries.get(i).isSelected;
 
-                if (viewMode == MainActivity.MODE_DELETE_EDIT)
+                if (mViewMode == ViewMode.DELETE_EDIT) {
                     notifyItemChanged(i);
+                }
 
                 break;
             }
@@ -173,14 +156,16 @@ public class PasswordEntryListAdapter
 
     public List<PasswordEntry> getSelectedItems() {
         List<PasswordEntry> passwordEntryCheckedList = new ArrayList<>();
-        for (MPasswordEntry e : passwordEntryList)
-            if (e.isSelected)
-                passwordEntryCheckedList.add(e);
+        for (MPasswordEntry e : mPasswordEntries) {
+            if (e.isSelected) {
+                passwordEntryCheckedList.add(e.passwordEntry);
+            }
+        }
         return passwordEntryCheckedList;
     }
 
-    public void updateViewMode(int viewMode) {
-        this.viewMode = viewMode;
+    public void updateViewMode(ViewMode viewMode) {
+        this.mViewMode = viewMode;
     }
 
     @Override
@@ -188,7 +173,7 @@ public class PasswordEntryListAdapter
         for (int i = 0 ; i < Math.abs(fromPosition - toPosition) ; i++) {
             int multiplier = (fromPosition < toPosition) ? 1 : -1;
             Collections.swap(
-                    passwordEntryList,
+                    mPasswordEntries,
                     fromPosition + i * multiplier,
                     fromPosition + i * multiplier + multiplier);
             notifyItemMoved(
@@ -200,23 +185,27 @@ public class PasswordEntryListAdapter
         List<PasswordEntry> passwordEntryAffectedList = new ArrayList<>();
         int i = fromPosition + ((fromPosition > toPosition)? 1 : -1);
         do {
-            if (fromPosition > toPosition)
+            if (fromPosition > toPosition) {
                 i--;
-            else
+            }
+            else {
                 i++;
-            passwordEntryList.get(i).order = i;
-            passwordEntryAffectedList.add(passwordEntryList.get(i));
+            }
+            mPasswordEntries.get(i).passwordEntry.order = i;
+            passwordEntryAffectedList.add(mPasswordEntries.get(i).passwordEntry);
         }
         while (i != toPosition);
-        if (mOnItemMoveListener != null)
+        if (mOnItemMoveListener != null) {
             mOnItemMoveListener.onItemMove(passwordEntryAffectedList);
+        }
     }
 
     @Override
     public void onItemDropped(int position) {
         notifyDataSetChanged();
-        if (mOnItemMoveListener != null)
+        if (mOnItemMoveListener != null) {
             mOnItemMoveListener.onItemDropped();
+        }
     }
 
     @Override
@@ -239,21 +228,29 @@ public class PasswordEntryListAdapter
         void onItemDropped();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
-        TextView tvEntryName, tvAccountName, etPassword;
+    public class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder, View.OnClickListener, View.OnLongClickListener {
+
+        TextView tvEntryName;
+        TextView tvAccountName;
+        TextView etPassword;
         ImageView ivPasswordVisibility;
         RoundedCornerLayout rclContainer;
         View vContainer;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
-            this.rclContainer = (RoundedCornerLayout) view.findViewById(R.id.rcl_container);
+
+            this.rclContainer = view.findViewById(R.id.rcl_container);
             this.vContainer = view.findViewById(R.id.ll_inner_container);
 
-            this.tvEntryName = (TextView) view.findViewById(R.id.tv_entry_name);
-            this.tvAccountName = (TextView) view.findViewById(R.id.tv_account_name);
-            this.etPassword = (TextView) view.findViewById(R.id.tv_password);
-            this.ivPasswordVisibility = (ImageView) view.findViewById(R.id.iv_password_visibility);
+            this.tvEntryName = view.findViewById(R.id.tv_entry_name);
+            this.tvAccountName = view.findViewById(R.id.tv_account_name);
+            this.etPassword = view.findViewById(R.id.tv_password);
+            this.ivPasswordVisibility = view.findViewById(R.id.iv_password_visibility);
+
+            this.ivPasswordVisibility.setOnClickListener(this);
+            this.vContainer.setOnClickListener(this);
+            this.vContainer.setOnLongClickListener(this);
         }
 
         @Override
@@ -267,15 +264,42 @@ public class PasswordEntryListAdapter
             rclContainer.setBackgroundColor(
                     ContextCompat.getColor(rclContainer.getContext(), R.color.colorPrimary));
         }
+
+        @Override
+        public void onClick(View v) {
+            if (v == ivPasswordVisibility) {
+                MPasswordEntry passwordEntry = mPasswordEntries.get(getAdapterPosition());
+                passwordEntry.isVisible = !passwordEntry.isVisible;
+                notifyItemChanged(getAdapterPosition());
+            }
+            else if (v == vContainer) {
+                PasswordEntry passwordEntry = mPasswordEntries.get(getAdapterPosition()).passwordEntry;
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onClick(passwordEntry);
+                }
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            PasswordEntry passwordEntry = mPasswordEntries.get(getAdapterPosition()).passwordEntry;
+            if (mItemTouchHelper != null && mViewMode == ViewMode.DEFAULT) {
+                mItemTouchHelper.startDrag(this);
+            }
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onLongClick(passwordEntry);
+            }
+            return false;
+        }
     }
 
-    private class MPasswordEntry extends PasswordEntry {
-        boolean isVisible, isSelected;
+    private class MPasswordEntry {
+        boolean isVisible;
+        boolean isSelected;
+        PasswordEntry passwordEntry;
 
         MPasswordEntry(PasswordEntry passwordEntry, boolean isVisible, boolean isSelected) {
-            super(passwordEntry.id,
-                    passwordEntry.entryName, passwordEntry.accountName,
-                    passwordEntry.password, passwordEntry.order);
+            this.passwordEntry = passwordEntry;
             this.isVisible = isVisible;
             this.isSelected = isSelected;
         }

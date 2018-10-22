@@ -13,6 +13,7 @@ import org.hugoandrade.passwordsmanagerapp.utils.OptionUtils;
 import org.hugoandrade.passwordsmanagerapp.R;
 import org.hugoandrade.passwordsmanagerapp.utils.SharedPreferencesUtils;
 import org.hugoandrade.passwordsmanagerapp.view.listadapter.PINDisplayListAdapter;
+import org.hugoandrade.passwordsmanagerapp.view.main.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
